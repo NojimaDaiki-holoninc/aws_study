@@ -1,0 +1,2962 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AWS入門教科書</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&amp;family=Noto+Sans+JP:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --bg:#F6F7F9; --surface:#FFFFFF; --ink:#1B2430; --muted:#5B6B7C; --line:#D9DEE4;
+  --accent:#0E7C86; --accent-ink:#0A5B62; --amber:#B7791F; --fig-bg:#EEF2F5; --fig-ink:#22303C;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F141A; --surface:#171E26; --ink:#E6EAEE; --muted:#9AA7B4; --line:#2A3542;
+    --accent:#3FB7C0; --accent-ink:#7FD3DA; --amber:#D9A441; --fig-bg:#0B1117; --fig-ink:#D7DEE6;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F141A; --surface:#171E26; --ink:#E6EAEE; --muted:#9AA7B4; --line:#2A3542;
+  --accent:#3FB7C0; --accent-ink:#7FD3DA; --amber:#D9A441; --fig-bg:#0B1117; --fig-ink:#D7DEE6;
+}
+
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Noto Sans JP","Hiragino Sans",sans-serif;
+  font-size:17px; line-height:1.9;
+}
+h1,h2,h3{
+  font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif;
+  font-weight:700; text-wrap:balance; color:var(--ink);
+}
+h1{font-size:1.9rem; margin:0 0 1.5rem;}
+h2{font-size:1.3rem; margin-top:3rem; margin-bottom:1rem;}
+h3{font-size:1rem; margin-top:1.5rem;}
+p,li{max-width:40rem;}
+a{color:var(--accent-ink); text-decoration:underline;}
+a:focus-visible, button:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+.eyebrow{
+  font-family:ui-monospace, Menlo, "SF Mono", Consolas, "Liberation Mono", monospace;
+  color:var(--muted); font-size:0.85rem; margin:0 0 0.5rem;
+}
+
+.topbar{
+  display:none; position:fixed; top:0; left:0; right:0; height:2.75rem;
+  background:var(--surface); border-bottom:1px solid var(--line); z-index:20;
+  align-items:center; padding:0 1rem;
+}
+.toc-btn{
+  font-family:"Noto Sans JP",sans-serif; font-size:0.9rem; color:var(--ink);
+  background:var(--bg); border:1px solid var(--line); border-radius:4px;
+  padding:0.4rem 0.8rem; cursor:pointer;
+}
+
+.layout{display:flex; align-items:flex-start;}
+
+.sidebar{
+  width:17rem; flex:none; position:sticky; top:0; height:100vh; overflow-y:auto;
+  border-right:1px solid var(--line); padding:2rem 1.25rem; background:var(--bg);
+}
+.site-title{
+  font-family:"Zen Kaku Gothic New",sans-serif; font-weight:700; font-size:1.1rem;
+  margin:0 0 1.5rem;
+}
+.toc, .toc ul{list-style:none; margin:0; padding:0;}
+.toc-group{margin-bottom:1.25rem;}
+.group-label{
+  display:block; font-size:0.7rem; letter-spacing:0.08em; text-transform:uppercase;
+  color:var(--muted); margin-bottom:0.4rem;
+}
+.toc a{
+  display:flex; gap:0.6rem; align-items:baseline; padding:0.25rem 0.4rem; border-radius:4px;
+  text-decoration:none; color:var(--ink); font-size:0.9rem;
+}
+.toc a:hover{background:var(--surface);}
+.toc a[aria-current="true"]{background:var(--surface); color:var(--accent-ink); font-weight:700;}
+.chnum{
+  font-family:ui-monospace, Menlo, "SF Mono", Consolas, "Liberation Mono", monospace; color:var(--muted); font-size:0.8rem; flex:none;
+}
+
+main{flex:1; min-width:0; padding:3rem 3rem 6rem; max-width:64rem;}
+
+section{padding-top:2rem;}
+section + section{border-top:1px solid var(--line); margin-top:5rem; padding-top:3rem;}
+
+blockquote{
+  margin:1.5rem 0; padding:1rem 1.25rem; border-left:3px solid var(--line);
+  background:var(--surface); max-width:40rem;
+}
+blockquote.lead{border-left-color:var(--accent);}
+.lead ul{margin:.5rem 0 0; padding-left:1.2rem;}
+blockquote.misconception{border-left:3px solid var(--amber);}
+blockquote.misconception strong{color:var(--amber);}
+blockquote.misconception p strong:nth-of-type(2){color:var(--accent-ink);}
+
+pre{
+  font-family:ui-monospace, Menlo, "SF Mono", Consolas, "Liberation Mono", monospace;
+  font-size:13.5px; line-height:1.45; tab-size:4; white-space:pre;
+  font-variant-ligatures:none; letter-spacing:0;
+  overflow-x:auto; max-width:100%; border-radius:4px; padding:1rem 1.25rem; margin:1.5rem 0;
+}
+pre.figure{background:var(--fig-bg); color:var(--fig-ink); border:1px solid var(--line); font-feature-settings:normal; letter-spacing:0;}
+pre.code{background:var(--fig-bg); color:var(--fig-ink); border:1px solid var(--line);}
+pre code{font:inherit; letter-spacing:inherit;}
+
+.table-wrap{overflow-x:auto; max-width:100%; margin:1.5rem 0;}
+table{border-collapse:collapse; width:100%;}
+th,td{border:1px solid var(--line); padding:0.5rem 0.75rem; text-align:left; font-size:0.92rem;}
+th{background:var(--surface);}
+
+li.task{list-style:none; margin-left:-1.4em;}
+li.task input{margin-right:0.5em;}
+
+aside.saa{
+  border-top:1px dashed var(--line); margin-top:2rem; padding-top:1.5rem;
+}
+aside.saa h3{color:var(--muted); font-size:1rem;}
+
+hr{border:none; border-top:1px solid var(--line); margin:2rem 0;}
+
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto;}
+}
+@media (prefers-reduced-motion: no-preference){
+  html{scroll-behavior:smooth;}
+}
+
+@media (max-width:899px){
+  .topbar{display:flex;}
+  .sidebar{
+    position:fixed; top:2.75rem; left:0; bottom:0; z-index:30; box-shadow:2px 0 8px rgba(0,0,0,0.15);
+    transform:translateX(-100%); transition:transform 0.2s ease;
+  }
+  .sidebar.open{transform:translateX(0);}
+  main{padding:4.5rem 1.25rem 4rem;}
+}
+
+</style>
+</head>
+<body>
+<div class="topbar"><button class="toc-btn" id="tocBtn" aria-expanded="false" aria-controls="sidebar">目次</button></div>
+<div class="layout">
+<nav class="sidebar" id="sidebar">
+<p class="site-title">AWS入門教科書</p>
+<ul class="toc">
+<li class="toc-group"><span class="group-label">導入</span><ul>
+<li><a href="#ch-00" data-target="ch-00"><span class="chnum">00</span><span class="chtitle">はじめに</span></a></li>
+<li><a href="#ch-01" data-target="ch-01"><span class="chnum">01</span><span class="chtitle">AWSとは何か</span></a></li>
+<li><a href="#ch-02" data-target="ch-02"><span class="chnum">02</span><span class="chtitle">EC2</span></a></li>
+</ul></li>
+<li class="toc-group"><span class="group-label">名前と住所</span><ul>
+<li><a href="#ch-03" data-target="ch-03"><span class="chnum">03</span><span class="chtitle">IPアドレス・ドメイン・DNS</span></a></li>
+<li><a href="#ch-04" data-target="ch-04"><span class="chnum">04</span><span class="chtitle">Route 53</span></a></li>
+</ul></li>
+<li class="toc-group"><span class="group-label">VPCの中</span><ul>
+<li><a href="#ch-05" data-target="ch-05"><span class="chnum">05</span><span class="chtitle">VPCとSubnet</span></a></li>
+<li><a href="#ch-06" data-target="ch-06"><span class="chnum">06</span><span class="chtitle">Internet GatewayとRoute Table</span></a></li>
+<li><a href="#ch-07" data-target="ch-07"><span class="chnum">07</span><span class="chtitle">NAT Gateway</span></a></li>
+<li><a href="#ch-08" data-target="ch-08"><span class="chnum">08</span><span class="chtitle">Security Group</span></a></li>
+<li><a href="#ch-09" data-target="ch-09"><span class="chnum">09</span><span class="chtitle">ALBとAuto Scaling</span></a></li>
+<li><a href="#ch-10" data-target="ch-10"><span class="chnum">10</span><span class="chtitle">RDS</span></a></li>
+</ul></li>
+<li class="toc-group"><span class="group-label">置いて配る</span><ul>
+<li><a href="#ch-11" data-target="ch-11"><span class="chnum">11</span><span class="chtitle">S3とSSG</span></a></li>
+<li><a href="#ch-12" data-target="ch-12"><span class="chnum">12</span><span class="chtitle">CloudFront</span></a></li>
+</ul></li>
+<li class="toc-group"><span class="group-label">組み立て</span><ul>
+<li><a href="#ch-13" data-target="ch-13"><span class="chnum">13</span><span class="chtitle">【組み立て1】Astro静的サイトのAWS構成</span></a></li>
+<li><a href="#ch-14" data-target="ch-14"><span class="chnum">14</span><span class="chtitle">【組み立て2】サーバーアプリケーションのAWS構成</span></a></li>
+<li><a href="#ch-15" data-target="ch-15"><span class="chnum">15</span><span class="chtitle">Netlify / Vercel は何を代わりにやってくれていたのか</span></a></li>
+</ul></li>
+<li class="toc-group"><span class="group-label">総まとめ</span><ul>
+<li><a href="#ch-16" data-target="ch-16"><span class="chnum">16</span><span class="chtitle">頭の中に持っておくAWS全体図</span></a></li>
+<li><a href="#ch-17" data-target="ch-17"><span class="chnum">17</span><span class="chtitle">次に学ぶことのロードマップ</span></a></li>
+</ul></li>
+<li class="toc-group"><span class="group-label">付録</span><ul>
+<li><a href="#glossary" data-target="glossary"><span class="chnum">付録</span><span class="chtitle">用語集</span></a></li>
+</ul></li>
+</ul>
+</nav>
+<main id="main">
+<section id="ch-00">
+<p class="eyebrow">はじめに</p>
+<h1>はじめに — この教科書の歩き方</h1>
+<h2>目的</h2>
+<p>この教科書は、フロントエンドエンジニアがAWS（Amazon Web Services。Amazon社が提供するクラウドサービス群の総称）を基礎から理解するための入門資料です。</p>
+<p>AWSの学習でつまずきやすいのは、「EC2とは」「VPCとは」というサービス名の説明を単独で覚えようとしてしまうことです。サービス名を暗記しても、それらがどう組み合わさってひとつのWebサイトを動かしているのかが見えないままでは、実務でもAWS認定試験でも応用が利きません。</p>
+<p>この教科書は逆の順序を取ります。「ブラウザにURLを入力してから画面が表示されるまでに、データがどこを通っているのか」という一本の道筋を先に見せ、その道筋上に登場する部品としてEC2・VPC・S3・CloudFrontなどを順番に説明していきます。読み終えたときには、AWSのサービス名を丸暗記した状態ではなく、「Webサイトを構成する部品と、部品同士の関係」を自分の言葉で説明できる状態を目指します。</p>
+<h2>対象読者</h2>
+<p>この教科書は、次のような方を想定しています。</p>
+<ul>
+<li>HTML / CSS / JavaScript / TypeScript は理解している</li>
+<li>Astro / Next.js などのフレームワークを使った経験がある</li>
+<li>Netlify / Vercel などへのデプロイ経験がある</li>
+<li>GitHubは日常的に使える</li>
+<li>サーバー・ネットワーク・インフラについては初心者</li>
+<li>将来的にフルスタックエンジニアを目指している、またはAWS認定資格（AWS Certified Solutions Architect - Associate。以下SAA）の取得を検討している</li>
+</ul>
+<p>つまり「フロントエンドは書けるが、その裏側で何が起きているかは分からない」という方に向けた内容です。</p>
+<h2>読み方</h2>
+<p>各章は次の順番で構成されています。</p>
+<ol>
+<li>なぜこれが必要なのか（困りごとから入る）</li>
+<li>中学生にもわかる説明</li>
+<li>身近なたとえ</li>
+<li>正式な技術的説明</li>
+<li>AWSでの具体例</li>
+<li>フロントエンド開発との関係（Netlify / Vercel / Astro / Next.jsとの対比）</li>
+<li>よくある勘違い</li>
+<li>覚えるべきポイント</li>
+</ol>
+<p>さらに各章の末尾に、SAA試験でどう問われるかという補足を簡潔に添えています。資格取得を考えていない方は読み飛ばしても構いません。</p>
+<p>第1章から第15章までは、Webサイトへのアクセスを外側（インターネット）から内側（サーバーやデータベース）へたどる一本のストーリーになっています。順番に読み進めることを推奨しますが、用語を調べたいだけの場合は目次から該当章に飛んでも読めるように、各章で専門用語の初出説明を省略していません。</p>
+<h2>完成予想図</h2>
+<p>この教科書のゴールは、次の2枚の図を自分で説明できるようになることです。まず、この2枚を先に見ておきましょう。</p>
+<p><strong>図A: 静的サイト構成図</strong>（Astroなどでビルドしたファイルだけを配信する構成）</p>
+<pre class="figure"><code>        User (Browser)
+              │
+              ▼
+         Route 53   (DNS: example.com ► CloudFront)
+              │
+              ▼
+        CloudFront   (CDN / HTTPS terminate / Cache)
+              │
+              ▼
+            S3       (dist/ : HTML, CSS, JS, images)
+</code></pre>
+<p><strong>図B: サーバーアプリ構成図</strong>（プログラムを常時動かして応答を作る構成）</p>
+<pre class="figure"><code>        User (Browser)
+              │
+              ▼
+         Route 53
+              │
+              ▼
+            ALB        (Public Subnet)
+         ┌────┴────┐
+         ▼         ▼
+       EC2        EC2   (Private Subnet / Auto Scaling)
+         └────┬────┘
+              ▼
+            RDS        (Private Subnet)
+</code></pre>
+<p>図Aは、Netlify/Vercelに静的サイトをデプロイするときに近い構成です。図Bは、常時稼働するサーバーとデータベースが必要なアプリケーション向けの構成です。この2つの違いと、それぞれに登場する部品の役割を説明できることが、この教科書のゴールです。</p>
+<h2>たとえ話の統一台帳</h2>
+<p>この教科書では、AWSの世界観を「<strong>国の中に、自分の土地を借りて、建物を建てる</strong>」というたとえで一貫させています。章によって違うたとえを使うと混乱するため、以下の対応表を統一して使用します。同じ対象に別のたとえが出てきた場合は誤りです。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>対象</th>
+<th>たとえ</th>
+<th>補足</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>クラウド全般</td>
+<td>電気（発電所を自分で作らない）</td>
+<td>第1章の導入専用</td>
+</tr>
+<tr>
+<td>AWS</td>
+<td>巨大な国・都市</td>
+<td>リージョン = その国の都市</td>
+</tr>
+<tr>
+<td>リージョン</td>
+<td>都市</td>
+<td>東京・大阪・バージニアなど</td>
+</tr>
+<tr>
+<td>VPC</td>
+<td>自分専用に借りた土地・敷地</td>
+<td>塀で囲われている</td>
+</tr>
+<tr>
+<td>Subnet</td>
+<td>敷地内の区画</td>
+<td>表の区画 / 奥の区画</td>
+</tr>
+<tr>
+<td>Public Subnet</td>
+<td>表の区画（道路に面している）</td>
+<td>来客が入れる</td>
+</tr>
+<tr>
+<td>Private Subnet</td>
+<td>奥の区画（道路に面していない）</td>
+<td>関係者以外立ち入り禁止</td>
+</tr>
+<tr>
+<td>Internet Gateway</td>
+<td>敷地の正門</td>
+<td>門を建てただけでは道は通っていない</td>
+</tr>
+<tr>
+<td>Route Table</td>
+<td>カーナビ / 道路標識</td>
+<td>「この宛先はあの門へ」</td>
+</tr>
+<tr>
+<td>NAT Gateway</td>
+<td>通用口（中から外へは出られるが、外からは入れない）</td>
+<td>出前を頼むイメージ</td>
+</tr>
+<tr>
+<td>Security Group</td>
+<td>建物の入口に立つ門番</td>
+<td>入館証チェック。名簿で入館のみ確認</td>
+</tr>
+<tr>
+<td>EC2</td>
+<td>敷地に建てた建物（働く人がいる事務所）</td>
+<td>「動かす場所」</td>
+</tr>
+<tr>
+<td>ALB</td>
+<td>受付・案内係</td>
+<td>空いている窓口へ案内</td>
+</tr>
+<tr>
+<td>Auto Scaling</td>
+<td>混雑に応じてスタッフを増減する店長</td>
+<td></td>
+</tr>
+<tr>
+<td>RDS</td>
+<td>金庫室・書庫（奥の区画にある）</td>
+<td>専門の管理人付き</td>
+</tr>
+<tr>
+<td>S3</td>
+<td>巨大な倉庫・ロッカー</td>
+<td>「置く場所」</td>
+</tr>
+<tr>
+<td>CloudFront</td>
+<td>各地の前線倉庫・コンビニ</td>
+<td>近くの店から受け取れば早い</td>
+</tr>
+<tr>
+<td>IPアドレス</td>
+<td>住所（番地）</td>
+<td></td>
+</tr>
+<tr>
+<td>ドメイン</td>
+<td>店の名前</td>
+<td></td>
+</tr>
+<tr>
+<td>DNS</td>
+<td>電話帳 / 住所録</td>
+<td></td>
+</tr>
+<tr>
+<td>Route 53</td>
+<td>AWSが運営する住所録</td>
+<td></td>
+</tr>
+<tr>
+<td>HTTPS証明書</td>
+<td>身分証明書</td>
+<td>第12章でのみ軽く触れる</td>
+</tr>
+</tbody>
+</table></div>
+<p>なお、EC2を「倉庫」と呼んだり、S3を「サーバー」と呼んだりはしません。Security Groupは「門」ではなく必ず「門番」と呼びます（「門」はInternet Gatewayのたとえです）。VPCも「建物」ではなく「土地」です。</p>
+<h2>目次</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>章</th>
+<th>ファイル</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>00</td>
+<td><a href="#ch-00">00-introduction.md</a></td>
+<td>はじめに（本章）</td>
+</tr>
+<tr>
+<td>01</td>
+<td><a href="#ch-01">01-what-is-aws.md</a></td>
+<td>AWSとは何か</td>
+</tr>
+<tr>
+<td>02</td>
+<td><a href="#ch-02">02-ec2.md</a></td>
+<td>EC2</td>
+</tr>
+<tr>
+<td>03</td>
+<td><a href="#ch-03">03-ip-dns-domain.md</a></td>
+<td>IPアドレス・ドメイン・DNS</td>
+</tr>
+<tr>
+<td>04</td>
+<td><a href="#ch-04">04-route53.md</a></td>
+<td>Route 53</td>
+</tr>
+<tr>
+<td>05</td>
+<td><a href="#ch-05">05-vpc-subnet.md</a></td>
+<td>VPCとSubnet</td>
+</tr>
+<tr>
+<td>06</td>
+<td><a href="#ch-06">06-igw-routetable.md</a></td>
+<td>Internet GatewayとRoute Table</td>
+</tr>
+<tr>
+<td>07</td>
+<td><a href="#ch-07">07-nat-gateway.md</a></td>
+<td>NAT Gateway</td>
+</tr>
+<tr>
+<td>08</td>
+<td><a href="#ch-08">08-security-group.md</a></td>
+<td>Security Group</td>
+</tr>
+<tr>
+<td>09</td>
+<td><a href="#ch-09">09-alb-autoscaling.md</a></td>
+<td>ALBとAuto Scaling</td>
+</tr>
+<tr>
+<td>10</td>
+<td><a href="#ch-10">10-rds.md</a></td>
+<td>RDS</td>
+</tr>
+<tr>
+<td>11</td>
+<td><a href="#ch-11">11-s3-ssg.md</a></td>
+<td>S3とSSG</td>
+</tr>
+<tr>
+<td>12</td>
+<td><a href="#ch-12">12-cloudfront.md</a></td>
+<td>CloudFront</td>
+</tr>
+<tr>
+<td>13</td>
+<td><a href="#ch-13">13-architecture-static.md</a></td>
+<td>組み立て1: 静的サイトのAWS構成</td>
+</tr>
+<tr>
+<td>14</td>
+<td><a href="#ch-14">14-architecture-server.md</a></td>
+<td>組み立て2: サーバーアプリのAWS構成</td>
+</tr>
+<tr>
+<td>15</td>
+<td><a href="#ch-15">15-vs-netlify-vercel.md</a></td>
+<td>Netlify / Vercelとの違い</td>
+</tr>
+<tr>
+<td>16</td>
+<td><a href="#ch-16">16-big-picture.md</a></td>
+<td>頭の中に持っておくAWS全体図</td>
+</tr>
+<tr>
+<td>17</td>
+<td><a href="#ch-17">17-next-roadmap.md</a></td>
+<td>次に学ぶことのロードマップ</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><strong>次の章</strong>: <a href="#ch-01">第1章 AWSとは何か</a> — なぜ自分でサーバーを買わなくてよくなったのか、という問いから旅を始めます。</p>
+</section>
+<section id="ch-01">
+<p class="eyebrow">第1章</p>
+<h1>第1章 AWSとは何か — サーバーを「買う」から「借りる」へ</h1>
+<blockquote class="lead">
+<p><strong>この章でわかること</strong></p>
+<ul>
+<li>AWSがどのような課題を解決するために生まれたサービスかを説明できる</li>
+<li>「クラウド」という言葉が指している具体的な仕組みを説明できる</li>
+<li>Netlify/Vercelも含めて、世の中の多くのサービスがクラウドの上で動いていることを説明できる</li>
+</ul>
+<p><strong>前の章とのつながり</strong>: 第0章で見た図A・図Bの旅を、ここから実際にたどっていきます。まずは旅の出発点である「AWSとは何か」から始めます。</p>
+</blockquote>
+<h2>なぜこれが必要なのか</h2>
+<p>Webサイトやアプリを世の中に公開するには、24時間365日動き続けるコンピューターが必要です。もし自分でそのコンピューターを用意しようとすると、機材を買う、設置する場所を用意する、壊れたら直す、アクセスが増えたら増設する、といった作業がすべて自分の仕事になります。これらを個人や一企業が自前で抱えるのは、時間的にもコスト的にも現実的ではありません。AWSは、この「コンピューターを自分で持つこと」に関わる作業を代わりに引き受けてくれるサービスです。</p>
+<h2>まずはざっくり: 中学生にもわかる説明</h2>
+<p>家で電気を使うとき、自分の家に発電機を置いて発電する人はいません。電力会社が発電所を持っていて、そこで作られた電気を必要な分だけ使い、使った分だけ料金を払います。</p>
+<p>AWSはこれに似ています。Amazonという会社が世界中に巨大なコンピューター施設を持っていて、そこにあるコンピューターの一部を、必要な分だけ借りて使うことができます。自分でコンピューターを買ったり、置き場所を用意したりする必要はありません。使った分だけ料金を払う仕組みになっています。</p>
+<h2>身近なたとえ</h2>
+<p>AWSは「電気」にたとえられます。自分の家に発電所を作らなくても、電力会社から電気を借りて使えるのと同じように、AWSを使えば自分でコンピューターを持たなくても、必要な計算能力やデータの保管場所を借りて使うことができます。</p>
+<p>そしてAWSという会社全体を「巨大な国・都市」にたとえると、この先の章で登場するVPC（自分専用の土地）やEC2（土地に建てた建物）は、その国の中に自分の区画を借りて建物を建てていくイメージになります。</p>
+<h2>技術的にはこういうこと</h2>
+<p>AWS（Amazon Web Services）は、Amazonが提供するクラウドコンピューティングサービスです。「クラウド」とは、インターネット経由でコンピューターの処理能力やデータの保管場所などを、必要な分だけ借りられる仕組みのことを指します。</p>
+<p>従来、Webサービスを公開するには、物理的なサーバー機材の購入、それを設置するデータセンターの用意、ネットワーク配線の構築、機材が壊れたときの障害対応、アクセス増加時のサーバー増設まで、すべて自社で行う必要がありました。AWSのようなクラウドサービスでは、これらの物理的な設備をAWS側が管理し、利用者はインターネット経由で必要な機能を呼び出して使うだけで済みます。</p>
+<p>AWSは世界中に「リージョン」と呼ばれる拠点を持っています。リージョンとは、東京・大阪・バージニアといった地理的に離れた場所に置かれた、独立したAWSの拠点のことです。利用者はどのリージョンでサービスを使うかを選ぶことができ、多くの場合、利用者に近いリージョンを選ぶことで通信の遅延を減らせます。</p>
+<pre class="figure"><code>        User
+          │
+          ▼
+      Internet
+          │
+          ▼
+   ┌─── AWS ──────────────────┐
+   │                          │
+   │  Region: Tokyo           │
+   │  Region: Osaka           │
+   │  Region: N.Virginia      │
+   │                          │
+   └──────────────────────────┘
+</code></pre>
+<p>AWSにはEC2（仮想サーバー）、S3（ファイル保管）、RDS（データベース）など数百のサービスがありますが、これらはすべて「自分で機材を持たずに、必要な機能を借りて使う」という同じ考え方の上に成り立っています。</p>
+<h2>AWSでの具体例</h2>
+<p>AWSを使い始めるには、AWSアカウントを作成し、マネジメントコンソール（Web上の管理画面）にログインします。そこから「EC2を1台起動する」「S3にファイルを保管する」といった操作を、画面上のクリック操作やコードで行います。</p>
+<p>利用料金は、借りた分だけ発生する従量課金制が基本です。例えばEC2であれば「起動していた時間」、S3であれば「保管したデータ量と転送量」に応じて課金されます。使っていない時間は原則として料金が発生しません（一部、確保しているだけで課金されるリソースもあります）。</p>
+<pre class="figure"><code>   User
+     │
+     ▼
+   AWS Management Console
+     │
+     ▼
+   Launch services (EC2 / S3 / RDS ...)
+     │
+     ▼
+   Pay only for what you use
+</code></pre>
+<p>（利用者がWeb画面のAWSマネジメントコンソールから必要なサービスを起動し、使った分だけ料金を支払う、という流れです）</p>
+<h2>フロントエンド開発との関係</h2>
+<p>Netlify や Vercel にサイトをデプロイするとき、私たちは「サーバーをどこに置くか」を意識することはほとんどありません。しかし、Netlify や Vercel も、実際には裏側でどこかのクラウド事業者のコンピューターを借りて動いています。そのクラウド事業者はAWSであることも、別のクラウドであることもありますが、いずれにせよ「自社でデータセンターを持たず、クラウドを借りて自社サービスを提供している」という構造は同じです。</p>
+<p>つまりNetlify/Vercelは、AWSのようなクラウドの上に、さらに「デプロイのしやすさ」という付加価値を乗せて提供しているサービスだと言えます。この教科書では、Netlify/Vercelが隠してくれていた部分を、AWSを使って自分の手で組み立てながら理解していきます。</p>
+<h2>よくある勘違い</h2>
+<blockquote class="misconception">
+<p><strong>勘違い</strong>: AWSはサーバーを貸してくれるだけのレンタルサーバーサービスである
+<strong>実際は</strong>: EC2（仮想サーバー）はAWSの数百あるサービスの一つに過ぎません。データベース、ファイル保管、CDN、DNSなど、Webサービス運営に必要な機能を幅広く提供しています。</p>
+<p><strong>勘違い</strong>: AWSを使えばインフラの知識がなくても自動で最適な構成になる
+<strong>実際は</strong>: AWSは部品を提供するサービスであり、どの部品をどう組み合わせるかは利用者が設計する必要があります。Netlify/Vercelのような「お任せ」の使いやすさとは異なります。</p>
+<p><strong>勘違い</strong>: クラウドは物理的な実体がない、仮想的な存在である
+<strong>実際は</strong>: クラウドの裏側には必ず物理的なコンピューター（サーバー機材）が存在します。それがどこの誰の機材で、どう管理されているかを利用者が意識しなくて済むようにしている、という点がクラウドの特徴です。</p>
+<p><strong>勘違い</strong>: AWSは高額で個人や小規模プロジェクトには向かない
+<strong>実際は</strong>: 使った分だけ支払う従量課金のため、小規模な利用であれば低コストで始められます。ただし設計次第でコストが変動する点には注意が必要です。</p>
+</blockquote>
+<h2>この章で覚えるべきポイント</h2>
+<ul>
+<li class="task"><input type="checkbox"> AWSは「自分でコンピューターを持たずに、必要な分だけ借りる」クラウドサービスであると説明できる</li>
+<li class="task"><input type="checkbox"> 従来型のサーバー運用（購入・設置・障害対応・増設）とクラウドの違いを説明できる</li>
+<li class="task"><input type="checkbox"> リージョンが地理的に離れた拠点であることを説明できる</li>
+<li class="task"><input type="checkbox"> 従量課金制の考え方を説明できる</li>
+<li class="task"><input type="checkbox"> Netlify/Vercelもクラウドの上で動いていることを説明できる</li>
+</ul>
+<aside class="saa">
+<h3>Solutions Architect Associate ではこう問われる</h3>
+<p>SAA試験では、オンプレミス（自社でサーバーを保有・運用する形態）とクラウドの違いを理解した上で、「なぜこの場面でAWSのマネージドサービス（AWSが運用・保守を代行してくれるサービスのこと）を選ぶのが適切か」という判断が問われます。単に「AWSは便利」ではなく、初期投資（設備購入費）が不要な点、需要変動に応じて増減できる点、保守・障害対応をAWS側に任せられる点、といった具体的なメリットが選択肢の正解根拠になります。</p>
+</aside>
+<hr />
+<p><strong>次の章</strong>: <a href="#ch-02">第2章 EC2 — プログラムを「動かす」場所</a> — AWSで実際にコンピューターを借りるとはどういうことかを見ていきます。</p>
+</section>
+<section id="ch-02">
+<p class="eyebrow">第2章</p>
+<h1>第2章 EC2 — プログラムを「動かす」場所</h1>
+<blockquote class="lead">
+<p><strong>この章でわかること</strong></p>
+<ul>
+<li>EC2がどのような課題を解決するサービスかを説明できる</li>
+<li>EC2上でWebサーバーが動く仕組みを説明できる</li>
+<li>Vercelのサーバーレス関数の裏側にも、EC2のような「動かす場所」があることを説明できる</li>
+</ul>
+<p><strong>前の章とのつながり</strong>: 前章では、AWSが「コンピューターを借りる」サービスであることを見ました。本章では、その「借りるコンピューター」の実体であるEC2を扱います。</p>
+</blockquote>
+<h2>なぜこれが必要なのか</h2>
+<p>Vercelにpushすれば数十秒でサイトが公開され、Next.jsのAPI Routeもすぐ動き出します。ここには「コンピューターを用意する」という作業は一切登場しません。では、なぜAWSを学ぶ上で「コンピューターを借りる」という話が必要になるのでしょうか。それは、Vercelのようなサービスが裏側で肩代わりしている「プログラムを実際に動かす場所」を、AWSでは自分で用意する必要があるからです。この「動かす場所」にあたるのがEC2です。</p>
+<h2>まずはざっくり: 中学生にもわかる説明</h2>
+<p>パソコンを買うと、自分でOS（Windows、macOSなど）を選び、必要なアプリをインストールして使いますよね。EC2は、それと同じことをインターネット上で行えるサービスです。ただし自分でパソコンを買うのではなく、AWSが持っているコンピューターの一部を「借りて」使います。</p>
+<p>借りたコンピューターの中に、Webサイトを表示するためのソフトをインストールすれば、そのコンピューターが「Webサーバー」として動き出します。つまりEC2は、プログラムを24時間動かし続けておく場所です。</p>
+<h2>身近なたとえ</h2>
+<p>AWSという国の中に、自分の土地（VPC。この後の章で説明します）を借りたとして、EC2はその土地に建てた「建物」にあたります。建物の中には働く人（動いているプログラム）がいて、来客（アクセスしてきたユーザー）の対応をしています。</p>
+<h2>技術的にはこういうこと</h2>
+<p>EC2（Amazon Elastic Compute Cloud）は、AWS上で利用できる仮想サーバーです。「仮想サーバー」とは、物理的な1台のコンピューターをソフトウェアで複数に分割し、あたかも個別の1台のコンピューターであるかのように使えるようにしたもののことです。</p>
+<p>EC2を起動する際には、OS（オペレーティングシステム。コンピューターを動かす基盤となるソフトウェアのこと。Linux、Windowsなど）を選びます。フロントエンド開発でよく使われる構成では、Linux系のOS（Amazon LinuxやUbuntuなど）を選ぶことが一般的です。</p>
+<p>OSを選んだあとは、そのOSの上に、目的に応じたソフトウェアをインストールします。例えばWebサーバーとして使うなら、Nginx（エンジンエックス。Webサーバーソフトの一つ）やApache、あるいはNode.jsをインストールし、その上でアプリケーションを動かします。</p>
+<p>さらに、EC2にはCPU性能やメモリ容量が異なる「インスタンスタイプ」という区分があり、用途に応じて選択します。マネージドサービス（AWSがサーバーの運用・保守を代行してくれるサービスの総称。障害対応やソフトウェア更新の一部をAWS側が担う）と比べると、EC2はOSより上のレイヤーの管理を利用者自身が行う必要がある点が特徴です。</p>
+<pre class="figure"><code>        User (Browser)
+              │
+              ▼
+            EC2                  ◄── ここが本章の主題
+     ┌───────────────────┐
+     │ OS (Linux)        │
+     │  └─ Nginx/Node.js │
+     └───────────────────┘
+</code></pre>
+<h2>AWSでの具体例</h2>
+<p>AWSマネジメントコンソールでEC2を起動する際には、次のような項目を設定します。</p>
+<ul>
+<li>AMI（Amazon Machine Image。OSやあらかじめ入っているソフトの組み合わせを定義したテンプレートのこと）の選択。例: Amazon Linux 2023</li>
+<li>インスタンスタイプの選択。例: t3.micro（小規模用途向けの安価な構成）</li>
+<li>ポート（通信の出入り口を区別する番号。1台のコンピューターで複数の通信を同時に扱うために使われる。Webの標準はHTTPが80番、HTTPSが443番）の開放設定。これは後述のSecurity Groupで行います。</li>
+</ul>
+<p>起動後、SSH（Secure Shell。サーバーに安全にリモート接続するための通信方式）でEC2に接続し、Nginxをインストールしてサイトを配信する、あるいはNode.jsをインストールしてアプリケーションサーバーを起動する、といった作業を行います。</p>
+<pre class="figure"><code>        Browser
+           │
+           ▼
+          EC2
+     ┌────────────┐
+     │  Nginx     │  :80   (HTTP)
+     │  Node.js   │  :3000 (App)
+     └────────────┘
+</code></pre>
+<h2>フロントエンド開発との関係</h2>
+<p>Vercelでサーバーレス関数（Next.jsのAPI RouteやServer Actionsなど）を実行すると、コードを書いてpushするだけでその関数が実行されます。私たちは「その関数がどこで動いているか」を意識しませんが、実際には裏側にコードを実行するためのコンピューターが存在します。その正体が、EC2のような仮想サーバー、あるいはそれに近い仕組みです。</p>
+<p>Vercelはこの「コンピューターを用意して動かす」という部分を完全に隠蔽し、コードをアップロードするだけで実行環境が用意される体験を提供しています。AWSでEC2を使う場合は、OSの選定、ソフトウェアのインストール、セキュリティ設定まで、自分で組み立てる必要があります。この違いが、後の章で触れる「AWSは自由度が高いが知識が必要」という特徴につながります。</p>
+<p>なお、この教科書ではEC2を「プログラムを動かす場所」として扱いますが、後の章で登場するS3は「ファイルを置く場所」として対比されます。この違いを意識しておくと、この先の章の理解がスムーズになります。</p>
+<h2>よくある勘違い</h2>
+<blockquote class="misconception">
+<p><strong>勘違い</strong>: EC2を借りれば自動でWebサイトが公開される
+<strong>実際は</strong>: OSは選んだAMIに含まれていますが、Webサーバーソフトのインストールや設定、公開のためのネットワーク設定は利用者が行う必要があります。</p>
+<p><strong>勘違い</strong>: EC2は1種類しかなく、性能を選べない
+<strong>実際は</strong>: EC2にはCPUやメモリの性能が異なる多数のインスタンスタイプがあり、用途に応じて選択できます。</p>
+<p><strong>勘違い</strong>: EC2はNode.jsアプリ専用のサービスである
+<strong>実際は</strong>: EC2はOSを自由に選べる汎用のコンピューターであり、Node.jsに限らずどんな言語・ソフトウェアでも動かせます。</p>
+<p><strong>勘違い</strong>: EC2を起動しただけでインターネットから安全にアクセスできる
+<strong>実際は</strong>: EC2をインターネットに公開するには、ネットワークの設定（後の章で説明するVPCやSecurity Groupなど）が別途必要です。</p>
+</blockquote>
+<h2>この章で覚えるべきポイント</h2>
+<ul>
+<li class="task"><input type="checkbox"> EC2が「プログラムを動かす場所」であることを説明できる</li>
+<li class="task"><input type="checkbox"> EC2ではOSを選び、その上にソフトウェアをインストールする必要があることを説明できる</li>
+<li class="task"><input type="checkbox"> インスタンスタイプという性能区分があることを説明できる</li>
+<li class="task"><input type="checkbox"> ポートが通信の出入り口を区別する番号であることを説明できる</li>
+<li class="task"><input type="checkbox"> Vercelのサーバーレス関数の裏にも「動かす場所」が存在することを説明できる</li>
+<li class="task"><input type="checkbox"> EC2(動かす場所)とS3(置く場所)が対比されることを覚えている</li>
+</ul>
+<aside class="saa">
+<h3>Solutions Architect Associate ではこう問われる</h3>
+<p>SAA試験では、EC2のインスタンスタイプの選び方や、用途に応じたOS・課金形態（オンデマンド、リザーブドなど）の使い分けが問われます。また「アプリケーションをどこで実行するか」という設計判断において、EC2（自分で管理する仮想サーバー）と、後の章で登場するマネージドサービス（AWSが管理を代行するサービス）のどちらを選ぶべきかという比較も頻出の論点です。</p>
+</aside>
+<hr />
+<p><strong>次の章</strong>: <a href="#ch-03">第3章 IPアドレス・ドメイン・DNS — 住所と電話帳</a> — <code>example.com</code> と入力するだけで、なぜ目的のコンピューターにたどり着けるのかを見ていきます。</p>
+</section>
+<section id="ch-03">
+<p class="eyebrow">第3章</p>
+<h1>第3章 IPアドレス・ドメイン・DNS — 住所と電話帳</h1>
+<blockquote class="lead">
+<p><strong>この章でわかること</strong></p>
+<ul>
+<li>IPアドレスが何をしているのかを説明できる</li>
+<li>ドメイン名とIPアドレスの関係、DNSが果たす役割を説明できる</li>
+<li><code>example.com</code> と打つだけで目的のサーバーに届く仕組みを説明できる</li>
+<li>DNSの変更がすぐには反映されないことがある理由を説明できる</li>
+</ul>
+<p><strong>前の章とのつながり</strong>: 前章では、EC2という「プログラムを動かす場所」を用意しました。しかし建物を建てただけでは、来客はその場所を見つけられません。この章では、インターネット上で「どこに行けばよいか」を特定する仕組みを扱います。</p>
+</blockquote>
+<h2>なぜこれが必要なのか</h2>
+<p>ブラウザに <code>example.com</code> と入力すると、世界のどこかにあるサーバーから正しくページが返ってきます。しかし、インターネットの世界には「住所」にあたる番号の仕組みしかなく、<code>example.com</code> のような文字列そのものでは通信できません。では、人間が読みやすい文字列と、機械が使う番号は、どこでどう結びついているのでしょうか。この結びつきの仕組みを知らないと、ドメインを取得しただけではサイトが表示されない理由も、Route 53のような「AWSのDNSサービス」がなぜ必要なのかも理解できません。</p>
+<h2>まずはざっくり: 中学生にもわかる説明</h2>
+<p>友達の家に手紙を送るとき、「田中さんの家」という呼び方だけでは郵便配達員は届けられません。実際には「東京都〇〇区〇〇1-2-3」という住所が必要です。インターネットも同じで、コンピューター同士は「住所」にあたる番号でしか相手を見つけられません。ただし人間は数字の羅列を覚えるのが苦手なので、「example.com」のような覚えやすい名前を使い、それを住所に変換する「電話帳」のような仕組みを間に挟んでいます。この電話帳の仕組みが、この章で説明するDNSです。</p>
+<h2>身近なたとえ</h2>
+<p>IPアドレスは「住所（番地）」、ドメインは「店の名前」、DNSは「電話帳・住所録」にあたります。私たちは「〇〇商店に行きたい」と思ったとき、店の名前だけで場所がわかるわけではなく、住所録を引いて番地を調べてから向かいます。インターネットでも、ブラウザは「example.comに行きたい」と思ったときに、まず電話帳（DNS）を引いて住所（IPアドレス）を調べ、その住所に向かって通信しています。</p>
+<h2>技術的にはこういうこと</h2>
+<p><strong>IPアドレス（Internet Protocol Address）</strong>は、インターネットに接続された機器を識別するための番号です。<code>203.0.113.10</code> のように、数字をピリオドで区切った形式（IPv4）で表されます。最終的に、ブラウザとサーバーの間の通信はすべてこのIPアドレスを使って行われます。</p>
+<p>IPアドレスには大きく分けて2種類があります。<strong>パブリックIPアドレス</strong>はインターネット上で直接やり取りできる、世界で重複しない番号です。一方<strong>プライベートIPアドレス</strong>は、家庭内のWi-Fiルーターの中や、AWSの中だけで使われる番号で、インターネットには直接出て行きません。<code>10.0.0.0</code> から始まる範囲や <code>192.168.0.0</code> から始まる範囲などが、プライベートIP用として予約されています。この区別は、第5章で登場するVPC（自分専用の仮想ネットワーク）を <code>10.0.0.0/16</code> というプライベートIPの範囲で構築する際の前提になりますので、ここで押さえておいてください。</p>
+<p><strong>ドメイン名</strong>は、<code>example.com</code> のように人間が読みやすい形式で表された名前です。ドメイン名自体はただの文字列で、通信の宛先そのものではありません。</p>
+<p><strong>DNS（Domain Name System）</strong>は、ドメイン名をIPアドレスに変換する仕組みです。この変換作業を「名前解決」と呼びます。DNSは1台のサーバーがすべての対応表を持っているわけではなく、階層構造になっています。</p>
+<pre class="figure"><code>        Browser
+           │
+           ▼
+      Root Server        (「.com はどこ？」を知っている)
+           │
+           ▼
+      TLD Server         (.com を管理する。次の行き先を知っている)
+           │
+           ▼
+   Authoritative DNS   (example.comの実際のIPアドレスを回答)
+           │
+           ▼
+      IP Address         (例: 203.0.113.10)
+</code></pre>
+<p>（TLDはTop Level Domainの略で、<code>.com</code> や <code>.jp</code> のようにドメインの一番右側にある部分を指します。Authoritative DNS（権威DNSサーバー）とは、あるドメインについて「正しい答え」を持っている、そのドメインの管理担当サーバーのことです。）</p>
+<p>この階層をたどるたびに問い合わせをしていると時間がかかるため、一度調べた結果は一定時間<strong>キャッシュ</strong>（問い合わせ結果を手元に一時保存しておくこと）されます。この保存期間を<strong>TTL（Time To Live）</strong>と呼び、秒単位で設定されます。TTLが3600（1時間）であれば、一度名前解決した結果は1時間の間、再度問い合わせずに使い回されます。これが「DNSの設定を変更しても、すぐには反映されない」ことがある理由です。世界中のブラウザやネットワーク機器がそれぞれ古い情報をキャッシュとして持っているため、変更が行き渡るまでには時間差が生じます。</p>
+<p>また、ブラウザとサーバーが通信する際には、IPアドレスに加えて<strong>ポート番号</strong>という情報も使われます。ポート番号は、同じ住所（IPアドレス）の中にある「どの窓口宛てか」を示す番号です。Webサイトの通信では、暗号化なしの通信（HTTP）はポート80、暗号化あり（HTTPS）はポート443が標準として使われます。ブラウザで <code>https://example.com</code> にアクセスすると、実際には「IPアドレス 203.0.113.10 のポート443宛て」に通信していることになります。</p>
+<h2>AWSでの具体例</h2>
+<p>Route 53（AWSのDNSサービス。詳細は次章で扱います）でドメインを管理する場合、ホストゾーンという設定単位の中に「example.com は 203.0.113.10 である」といった対応情報（レコード）を登録します。この情報が、権威DNSサーバーとして世界に公開される内容になります。</p>
+<pre class="figure"><code>        Browser
+           │
+           ▼
+      DNS (Route 53)     example.com ► 203.0.113.10
+           │
+           ▼
+       IP Address
+           │
+           ▼
+        Server           (ポート443でHTTPSを待ち受け)
+</code></pre>
+<p>レコードにはTTLを設定でき、値を短くしておくと変更の反映が速くなりますが、その分すべての問い合わせがキャッシュを介さず届くことになります。</p>
+<h2>フロントエンド開発との関係</h2>
+<p>VercelにNext.jsアプリをデプロイすると、<code>your-app.vercel.app</code> のようなサブドメインが自動的に割り当てられ、すぐにアクセスできるようになります。これは、Vercel側があらかじめ用意している親ドメイン（<code>vercel.app</code>）の下にDNSレコードを自動的に追加してくれているためです。一方、そこに独自ドメイン（例えば <code>example.com</code>）を設定する場合は、ドメインの管理画面（お名前.comやRoute 53など）で「このドメインはVercelを見てください」という設定（DNSレコードの追加）を自分で行う必要があります。この設定を追加した直後にアクセスしてもまだ反映されていないことがあるのは、まさに前述のTTLによるキャッシュが原因です。「ドメインをつないだのにまだ古いサイトが見える」という経験がある方は、DNSのキャッシュが効いていたことになります。</p>
+<h2>よくある勘違い</h2>
+<blockquote class="misconception">
+<p><strong>勘違い</strong>: ドメインを取得すれば、それだけでサイトが表示される。
+<strong>実際は</strong>: ドメインは名前にすぎず、そのドメインとサーバーのIPアドレスを結びつけるDNSの設定（レコードの登録）が別途必要です。</p>
+<p><strong>勘違い</strong>: DNSの設定を変更すれば、世界中で即座に反映される。
+<strong>実際は</strong>: TTLによるキャッシュが各所に残っているため、反映には設定したTTLの時間程度、あるいはそれ以上かかることがあります。</p>
+<p><strong>勘違い</strong>: IPアドレスはすべてインターネットから直接アクセスできる。
+<strong>実際は</strong>: パブリックIPとプライベートIPの区別があり、プライベートIPは特定のネットワーク内でのみ通用し、インターネットへは直接出られません。</p>
+<p><strong>勘違い</strong>: ポート番号は特別な場合だけ意識すればよい。
+<strong>実際は</strong>: <code>https://</code> でアクセスするたびに、裏側では常にポート443番宛ての通信が行われています。私たちが意識していないだけです。</p>
+</blockquote>
+<h2>この章で覚えるべきポイント</h2>
+<ul>
+<li class="task"><input type="checkbox"> IPアドレスが通信の最終的な宛先であり、ドメイン名はそのための人間向けの別名であると説明できる</li>
+<li class="task"><input type="checkbox"> DNSがドメイン名をIPアドレスに変換する「名前解決」の仕組みであると説明できる</li>
+<li class="task"><input type="checkbox"> ルートサーバー→TLDサーバー→権威DNSサーバーという階層をたどって名前解決が行われると説明できる</li>
+<li class="task"><input type="checkbox"> TTLによるキャッシュが、DNS変更の反映に時間差を生む理由であると説明できる</li>
+<li class="task"><input type="checkbox"> パブリックIPとプライベートIPの違いを説明できる</li>
+<li class="task"><input type="checkbox"> HTTPはポート80、HTTPSはポート443が標準で使われることを説明できる</li>
+</ul>
+<aside class="saa">
+<h3>Solutions Architect Associate ではこう問われる</h3>
+<p>DNSの階層構造そのものよりも、「名前解決の仕組みを理解した上でRoute 53の各種レコードを正しく選べるか」が問われやすい領域です。また、TTLの値を大きくするか小さくするかで、キャッシュ効率と変更反映速度のどちらを優先するかという設計判断が問われることがあります。パブリックIPとプライベートIPの区別は、VPCやSubnet設計の前提知識として当然視されるため、単独の設問というより後続章の内容の土台になります。</p>
+</aside>
+<hr />
+<p><strong>次の章</strong>: <a href="#ch-04">第4章 Route 53 — AWSの住所録</a> — DNSの一般的な仕組みを踏まえて、AWSが提供するDNSサービスであるRoute 53の具体的な機能を見ていきます。</p>
+</section>
+<section id="ch-04">
+<p class="eyebrow">第4章</p>
+<h1>第4章 Route 53 — AWSの住所録</h1>
+<blockquote class="lead">
+<p><strong>この章でわかること</strong></p>
+<ul>
+<li>Route 53がAWSの中でどんな役割を持つサービスかを説明できる</li>
+<li>ホストゾーンと、Aレコード・CNAME・Aliasレコードの違いを説明できる</li>
+<li>CloudFrontやALB、S3を指す際にAliasレコードが使われる理由を説明できる</li>
+<li>Route 53が「DNSサービス」であり、CDNやサーバーそのものではないことを説明できる</li>
+</ul>
+<p><strong>前の章とのつながり</strong>: 前章では、ドメイン名をIPアドレスに変換するDNSという仕組み一般について説明しました。この章では、AWSがそのDNSの仕組みをサービスとして提供している「Route 53」を具体的に見ていきます。</p>
+</blockquote>
+<h2>なぜこれが必要なのか</h2>
+<p>DNSの仕組み自体は、どの事業者が提供していても同じです。では、なぜAWSはわざわざ自前のDNSサービスであるRoute 53を用意しているのでしょうか。すでにドメインを取得したお名前.comなどのレジストラでもDNSの設定はできるのに、AWSの構成ではRoute 53が使われることが多いのはなぜか。この疑問に答えるには、Route 53がAWSの他のサービス(CloudFront、ALB、S3など)と密に連携する設計になっていることを理解する必要があります。</p>
+<h2>まずはざっくり: 中学生にもわかる説明</h2>
+<p>前の章で、DNSは「電話帳」のようなものだと説明しました。Route 53は、AWSという会社が用意している電話帳サービスです。世の中にはいくつも電話帳を作っている会社がありますが、AWSの中で建てた建物（EC2など)やAWSが用意した倉庫（S3）、各地に置いた前線倉庫（CloudFront）を案内するときには、AWS自身が作った電話帳を使うほうが都合よく連携できるようになっています。</p>
+<h2>身近なたとえ</h2>
+<p>Route 53は「AWSが運営する住所録」です。AWSという巨大な国の中に建物や施設を作ったとき、その国が発行している公式の住所録に登録しておけば、道案内がスムーズに行われます。他社の住所録を使うこともできますが、その国独自の仕組み（あとで説明するAliasレコードなど）は、その国の住所録でなければ使えません。</p>
+<h2>技術的にはこういうこと</h2>
+<p>Route 53は、AWSが提供するDNSサービスです。ドメインの管理は<strong>ホストゾーン</strong>という単位で行います。ホストゾーンとは、あるドメイン（例えば <code>example.com</code>）についてのDNSレコードをまとめて管理する箱のようなものです。ホストゾーンの中に、複数の<strong>レコード</strong>を登録していきます。</p>
+<p>代表的なレコードには次のものがあります。</p>
+<ul>
+<li><strong>Aレコード</strong>: ドメイン名を直接IPアドレスに対応づけるレコードです。「example.com は 203.0.113.10 である」という形式で登録します。</li>
+<li><strong>CNAMEレコード</strong>: あるドメイン名を、別のドメイン名の別名として登録するレコードです。「www.example.com は xxxx.cloudfront.net の別名である」という形式で登録します。</li>
+<li><strong>Aliasレコード</strong>: Route 53が独自に提供する拡張機能で、AレコードやCNAMEレコードのように見えつつ、実際にはCloudFront、ALB、S3といったAWSのサービスを直接指し示すことができる特別なレコードです。</li>
+</ul>
+<p>CloudFront（AWSのCDN、詳しくは第12章）やALB（負荷分散装置、詳しくは第9章）、S3（詳しくは第11章）を指す際には、このAliasレコードが使われます。その理由は2つあります。</p>
+<p>1つ目は、<strong>Zone Apexにはドメイン仕様上CNAMEを使えない</strong>という制約です。Zone Apex（ゾーンエイペックス）とは、<code>www</code> のようなサブドメインが付いていない、ドメインの頂点そのもの（<code>example.com</code> 自体）を指します。DNSの仕様上、CNAMEレコードはその名前に他のレコードと同居することができません。一方でZone Apexには、SOAレコードやNSレコード（どちらもそのゾーンの管理情報を示すレコードです）が必ず存在します。この2つが同居している以上、同じ名前にCNAMEを追加で置くことはできず、結果としてZone Apexには CNAMEを設定できないことになります。しかし「<code>example.com</code> そのものにアクセスしたら、CloudFrontに転送したい」というニーズは非常に多くあります。Aliasレコードは見た目上Aレコードの形式を取りながら、CloudFrontなどのAWSサービスを指せるため、この制約を回避できます。</p>
+<p>2つ目は、<strong>Aliasレコードにはクエリ料金がかからない</strong>という点です。通常のDNSレコードへの問い合わせにはRoute 53の利用料金が発生しますが、Aliasレコードを経由してAWSサービスを指す場合の問い合わせには料金がかかりません。</p>
+<pre class="figure"><code>        Browser
+           │
+           ▼
+      Route 53   (Hosted Zone: example.com)
+           │       example.com  ► Alias ► CloudFront
+           │       www.example.com ► CNAME ► xxxx.cloudfront.net
+           ▼
+      CloudFront
+           │
+           ▼
+            S3
+</code></pre>
+<h2>AWSでの具体例</h2>
+<p>実際の設定では、Route 53のコンソールでホストゾーンを開き、レコードを追加します。Zone Apexの <code>example.com</code> をCloudFrontに向けたい場合は、レコードタイプを「A」にした上で、「エイリアス」を有効にし、対象としてCloudFrontディストリビューションを選択します。<code>www.example.com</code> のようなサブドメインの場合は、同様にAliasを使うことも、通常のCNAMEで <code>xxxx.cloudfront.net</code> を直接指定することもできますが、AWSサービスを指す場合は料金面・仕様面の理由からAliasを使うのが基本です。</p>
+<pre class="figure"><code>Hosted Zone: example.com
+┌───────────┬───────────────────┬────────────────────┐
+│ Type      │ Name              │ Target             │
+├───────────┼───────────────────┼────────────────────┤
+│ A (Alias) │ example.com       │ CloudFront         │
+│ A (Alias) │ api.example.com   │ ALB                │
+│ CNAME     │ blog.example.com  │ xxxx.wordpress.com │
+└───────────┴───────────────────┴────────────────────┘
+</code></pre>
+<p>（Type=種別、Name=登録するドメイン名、Target=参照先。Zone Apexである <code>example.com</code> と <code>api.example.com</code> はAliasでCloudFront・ALBを指し、サブドメインの <code>blog.example.com</code> は通常のCNAMEで別サービスを指しています。）</p>
+<h2>フロントエンド開発との関係</h2>
+<p>Netlifyや Vercelでは、ダッシュボード上で独自ドメインを入力し、指示されたレコード（多くはAレコードかCNAME）をドメインの管理画面に追加するだけで済みます。裏側では、Netlify・Vercelがそれぞれ自社のDNS基盤やCDNの入り口を用意しており、利用者はその詳細を意識する必要がありません。AWSでRoute 53を使う場合は、この「ドメインとCDN・サーバーを結びつける」作業を、ホストゾーンの作成からレコードタイプの選定まで自分で行うことになります。特に「Zone ApexにはCNAMEが使えないので、AWSではAliasという専用の仕組みがある」という点は、Netlify・Vercelでは意識せず済んでいた仕様上の制約が、AWSでは表に出てくる典型例といえます。</p>
+<h2>よくある勘違い</h2>
+<blockquote class="misconception">
+<p><strong>勘違い</strong>: Route 53はCDNやWebサーバーの一種である。
+<strong>実際は</strong>: Route 53はあくまでDNSサービスであり、ドメイン名をIPアドレスや他のAWSサービスに変換する役割のみを持ちます。実際にコンテンツを配信するのはCloudFrontやS3、EC2などの別のサービスです。</p>
+<p><strong>勘違い</strong>: AWSのサービスを指すときも、普通のCNAMEで十分である。
+<strong>実際は</strong>: Zone Apex（<code>example.com</code> そのもの）にはDNS仕様上CNAMEを置けません。CloudFrontやALB、S3を指すにはAliasレコードを使うのが基本です。</p>
+<p><strong>勘違い</strong>: AliasレコードはCNAMEの単なる別名で、機能的な違いはない。
+<strong>実際は</strong>: AliasレコードはZone Apexに設定できる点、そしてAWSサービスへの問い合わせにクエリ料金がかからない点で、通常のCNAMEやAレコードとは異なります。</p>
+<p><strong>勘違い</strong>: ドメインを取得した会社（レジストラ）でしかDNSの設定はできない。
+<strong>実際は</strong>: ドメインの登録（レジストラでの管理）と、実際に名前解決を行うDNSサービスの指定は分離できます。レジストラ側で「このドメインのDNSはRoute 53に任せる」という設定（ネームサーバーの変更）を行うことで、Route 53側でレコードを管理できるようになります。</p>
+</blockquote>
+<h2>この章で覚えるべきポイント</h2>
+<ul>
+<li class="task"><input type="checkbox"> Route 53がAWSの提供するDNSサービスであり、ホストゾーン単位でドメインのレコードを管理すると説明できる</li>
+<li class="task"><input type="checkbox"> Aレコード・CNAMEレコード・Aliasレコードの違いを説明できる</li>
+<li class="task"><input type="checkbox"> Zone ApexにCNAMEを設定できない理由を説明できる</li>
+<li class="task"><input type="checkbox"> CloudFront・ALB・S3を指す際にAliasレコードが使われる2つの理由（Zone Apex制約の回避、クエリ料金がかからない）を説明できる</li>
+<li class="task"><input type="checkbox"> Route 53自体はDNSサービスであり、CDNやサーバーそのものではないと説明できる</li>
+</ul>
+<aside class="saa">
+<h3>Solutions Architect Associate ではこう問われる</h3>
+<p>「Zone Apex（例: <code>example.com</code> 自体）にCloudFrontやALBを紐付けたい場合、CNAMEではなくAliasレコードを使う」という判断が定番の論点です。CNAMEとAliasの違い（DNS仕様上の制約、クエリ料金の有無）を問う設問が典型的で、「なぜAliasを選ぶべきか」という理由まで含めて理解しているかが問われます。単に「Route 53を使う」という選択肢だけでなく、レコードタイプの使い分けが正解を分けるポイントになりやすい分野です。</p>
+</aside>
+<hr />
+<p><strong>次の章</strong>: <a href="#ch-05">第5章 VPCとSubnet — 自分専用の土地と区画</a> — ドメインとDNSでサーバーの場所を見つけられるようになったところで、次はそのサーバーをAWS上のどんな場所に置くのかを見ていきます。</p>
+</section>
+<section id="ch-05">
+<p class="eyebrow">第5章</p>
+<h1>第5章 VPCとSubnet — 自分専用の土地と区画</h1>
+<blockquote class="lead">
+<p><strong>この章でわかること</strong></p>
+<ul>
+<li>なぜEC2をいきなりインターネットに置かず、先に「土地」を用意するのかを説明できる</li>
+<li>VPCとSubnetの関係、そしてCIDR表記（<code>10.0.0.0/16</code> のような書き方）の読み方を説明できる</li>
+<li>Public SubnetとPrivate Subnetの違いを、「何が置かれるか」ではなく「どういう性質か」で説明できる</li>
+<li>重要なデータをインターネットに直接さらさない構成が、なぜ安全なのかを説明できる</li>
+</ul>
+<p><strong>前の章とのつながり</strong>: 第4章までで、<code>example.com</code> という名前がRoute 53によってIPアドレスに変換され、リクエストが特定のサーバーへ向かうところまでを見ました。ここからは「では、その到着先であるサーバーは、どういう場所に置かれているのか」という内側の話に入ります。</p>
+</blockquote>
+<h2>なぜこれが必要なのか</h2>
+<p>第2章で、EC2は「AWS上で借りられる仮想コンピューター」だと学びました。ではその1台を借りるとき、そのコンピューターはどこに置かれるのでしょうか。世界中の誰からでも直接触れる、むき出しの場所でしょうか。</p>
+<p>もしそうなら、アプリケーションを動かすサーバーだけでなく、顧客の個人情報が入ったデータベースまで、インターネット上の全員から到達可能な場所に置かれることになります。世界中の攻撃者が毎日自動でスキャンをかけている場所に、無防備な金庫を置くようなものです。</p>
+<p>さらに、サーバーが増えたとき「公開してよいもの」と「そうでないもの」を1台ずつ管理するのは現実的ではありません。</p>
+<p>だからAWSでは、EC2を作る前に<strong>まず自分専用のネットワーク領域を用意し、その中をさらに用途別に分ける</strong>という順番を取ります。それがVPCとSubnetです。この章は「AWSにおける置き場所の地図の描き方」を扱います。</p>
+<h2>まずはざっくり: 中学生にもわかる説明</h2>
+<p>AWSという巨大な国に、あなたが引っ越してきたとします。いきなり道端に机を置いて仕事を始めるわけにはいきません。まず土地を借ります。</p>
+<p>借りた土地には塀があって、外からは勝手に入れません。中をどう使うかは持ち主であるあなたの自由です。そこであなたは、土地の中に線を引いて区画に分けます。</p>
+<ul>
+<li>表通りに面した区画。ここには来客が入ってくることを想定した建物を建てます。</li>
+<li>奥まった区画。ここには外の道路から直接入れる出入り口を作りません。大事なものはここにしまいます。</li>
+</ul>
+<p>この「借りた土地」がVPC、「土地の中の区画」がSubnetです。そして表通りに面した区画がPublic Subnet、奥の区画がPrivate Subnetです。</p>
+<p>ポイントは、区画を分ける作業を<strong>建物を建てる前に</strong>やる、という点です。あとから守り方を考えるより、最初から「これは奥の区画に建てる」と決めておくほうが、間違いが起きません。</p>
+<h2>身近なたとえ</h2>
+<p>AWSは巨大な国・都市です。その中の一区画を、あなたは自分専用に借ります。これがVPCで、周りは塀で囲われています。隣の土地には別の会社が入っていますが、塀があるので互いの中は見えませんし、行き来もできません。</p>
+<p>土地の中は、あなたが自由に区画割りできます。表の区画は道路に面していて、来客がたどり着けます。奥の区画は道路に面しておらず、関係者以外は立ち入れません。</p>
+<p>大事なのは、<strong>この時点ではまだ門を建てていない</strong>ということです。土地を借りて区画を引いただけでは、外の道路と土地の中はつながっていません。門をどこに建て、どの道を通すのかは第6章の話です。この章では、地面に線を引くところまでを扱います。</p>
+<h2>技術的にはこういうこと</h2>
+<p><strong>VPC（Virtual Private Cloud）</strong>とは、AWSアカウント内に作る、論理的に隔離された仮想ネットワークです。「論理的に隔離」とは、物理的には他の利用者と同じAWSの設備を使っていても、ネットワークとしては完全に別物として扱われる、という意味です。あなたのVPCの中の通信は、他の利用者のVPCからは見えません。</p>
+<p>VPCを作るときに必ず指定するのが、<strong>CIDR（サイダー、Classless Inter-Domain Routing）ブロック</strong>です。これは「このネットワークで使うIPアドレスの範囲」を1行で表す書き方で、<code>10.0.0.0/16</code> のように書きます。</p>
+<p>読み方を分解します。IPアドレスは内部的には32個の0と1（32ビット）で表現されています。<code>/16</code> は「先頭の16ビットは固定、残りの16ビットは自由に使える」という意味です。この「先頭の何ビットを固定するか」を示す部分を<strong>サブネットマスク</strong>と呼びます。</p>
+<ul>
+<li><code>10.0.0.0/16</code> → <code>10.0.</code> までが固定。<code>10.0.0.0</code> 〜 <code>10.0.255.255</code> の約6万5千個。</li>
+<li><code>10.0.1.0/24</code> → <code>10.0.1.</code> までが固定。<code>10.0.1.0</code> 〜 <code>10.0.1.255</code> の256個。</li>
+</ul>
+<p>つまり、<strong><code>/</code> のあとの数字が大きいほど固定部分が長く、範囲は狭くなります</strong>。VPC全体には広い範囲（<code>/16</code>）を割り当て、その中の区画にはより狭い範囲（<code>/24</code>）を切り出す、という関係になります。</p>
+<p>なお <code>10.</code> で始まるアドレスは<strong>プライベートIPアドレス</strong>と呼ばれる範囲の一部です。これはインターネット上では使われないと決められている、組織の内部専用のアドレスです（<code>10.0.0.0/8</code>、<code>172.16.0.0/12</code>、<code>192.168.0.0/16</code> の3範囲。自宅のWi-Fiルーターが配る <code>192.168.x.x</code> も同じ仲間です）。対して、インターネット上で一意に識別されるアドレスを<strong>パブリックIPアドレス</strong>と呼びます。VPC内のリソースはまずプライベートIPアドレスを持ち、外と通信する必要があるものだけが別途パブリックIPアドレスを持ちます。</p>
+<p><strong>Subnet（サブネット）</strong>は、VPCのCIDRブロックをさらに小さく切り分けた区画です。EC2やRDSといったリソースは、VPCに直接置かれるのではなく、必ずどれかのSubnetの中に置かれます。</p>
+<p>ここで1つだけ事実を述べておきます。<strong>Subnetは必ず1つのアベイラビリティゾーン（AZ、同一リージョン内で電源や設備が独立したデータセンター群）の中に作られ、複数のAZにまたがれません</strong>。詳細は第17章で扱います。</p>
+<p>そして<strong>Public Subnet / Private Subnet という種類のSubnetがAWSに存在するわけではありません</strong>。どちらも作り方は同じSubnetです。違いは、そのSubnetに紐づけられた通信ルール（Route Table）が、インターネット向けの経路を持っているかどうかだけです。この「なぜ設定次第で性質が変わるのか」が次章の主題です。</p>
+<p>図C: VPC内部図（本書を通じて基準になる図）</p>
+<pre class="figure"><code>            Internet
+               │
+               ▼
+      ┌─── Internet Gateway ───┐
+      │                        │
+┌─────┴────────── VPC ─────────┴─────┐
+│ 10.0.0.0/16                        │
+│                                    │
+│  ┌─── Public Subnet 10.0.1.0/24 ─┐ │
+│  │   ALB                         │ │
+│  │   NAT Gateway                 │ │
+│  └───────────────────────────────┘ │
+│                 │                  │
+│                 ▼                  │
+│  ┌─── Private Subnet 10.0.2.0/24 ┐ │
+│  │   EC2  (App)                  │ │
+│  │   RDS  (Database)             │ │
+│  └───────────────────────────────┘ │
+│                                    │
+└────────────────────────────────────┘
+</code></pre>
+<p>これが本書で目指す完成形です。ただしいきなりこの形を扱うと登場人物が多すぎるため、<strong>第5章から第8章までは、EC2を1台だけPublic Subnetに置いた単純な構成</strong>で説明を進めます。</p>
+<pre class="figure"><code>            Internet
+               │
+               ▼
+      ┌─── Internet Gateway ───┐
+      │                        │
+┌─────┴────────── VPC ─────────┴─────┐
+│ 10.0.0.0/16                        │
+│                                    │
+│  ┌─── Public Subnet 10.0.1.0/24 ─┐ │
+│  │   EC2  (App)                  │ │  ◄── ここが本章の主題
+│  └───────────────────────────────┘ │
+│                                    │
+│  ┌─── Private Subnet 10.0.2.0/24 ┐ │
+│  │   RDS  (Database)             │ │
+│  └───────────────────────────────┘ │
+│                                    │
+└────────────────────────────────────┘
+</code></pre>
+<p><strong>第9章でALBを導入したら、EC2はPrivate Subnetへ移します。</strong> そのとき外から直接触れるのはALBだけになり、EC2はALB経由でしかアクセスできなくなります。上の図は学習の途中段階であり、最終形ではありません。</p>
+<p>なお、この図は説明のためにSubnetを1つずつしか描いていません。実運用ではPublic / Privateともに複数のAZにまたがって2つ以上作るのが基本です（ALBやRDSがそれを要求します。第9章・第10章で扱います）。</p>
+<h2>AWSでの具体例</h2>
+<p>マネジメントコンソール（AWSをブラウザから操作する管理画面）で実際に作る場合、指定する項目はごく少数です。VPCを作るとき:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>入力する値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Name tag</td>
+<td><code>my-app-vpc</code></td>
+</tr>
+<tr>
+<td>IPv4 CIDR block</td>
+<td><code>10.0.0.0/16</code></td>
+</tr>
+<tr>
+<td>Tenancy</td>
+<td>Default</td>
+</tr>
+</tbody>
+</table></div>
+<p>作成されると <code>vpc-0a1b2c3d4e5f6a7b8</code> のようなVPC IDが払い出され、以降の設定ではこのIDでVPCを指定します。Subnetを作るとき:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>Public用</th>
+<th>Private用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VPC</td>
+<td><code>my-app-vpc</code></td>
+<td><code>my-app-vpc</code></td>
+</tr>
+<tr>
+<td>Name tag</td>
+<td><code>my-app-public-1a</code></td>
+<td><code>my-app-private-1a</code></td>
+</tr>
+<tr>
+<td>Availability Zone</td>
+<td><code>ap-northeast-1a</code></td>
+<td><code>ap-northeast-1a</code></td>
+</tr>
+<tr>
+<td>IPv4 CIDR block</td>
+<td><code>10.0.1.0/24</code></td>
+<td><code>10.0.2.0/24</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>名前に <code>public</code> / <code>private</code> と付けていますが、これは人間が区別するためのタグにすぎません。この時点では両者に機能的な違いは一切ありません。</p>
+<p>この状態でEC2を <code>10.0.1.0/24</code> のSubnetに起動すると、<code>10.0.1.42</code> のようなプライベートIPアドレスが自動で割り当てられ、同じVPC内の別のリソースからは到達できます。しかし<strong>インターネットからは、この時点ではまだ一切到達できません</strong>。何が足りないのかは次章で明らかにします。</p>
+<p>なお、AWSアカウントには各リージョンに「デフォルトVPC」が最初から用意されています。何も設定していないEC2にインターネットからアクセスできた場合、それはデフォルトVPCが公開用の設定を済ませてくれているからです。本番環境では自分でVPCを作るのが一般的です。</p>
+<h2>フロントエンド開発との関係</h2>
+<p>NetlifyやVercelにAstroやNext.jsのプロジェクトをデプロイしたとき、CIDRブロックを入力した記憶はないはずです。Subnetを2つ作った覚えもないでしょう。GitHubにpushして、ビルドが走って、URLが発行される。それだけです。</p>
+<p>これは、Netlify/Vercelには<strong>ユーザーから見えるネットワーク層が存在しない</strong>からです。彼らのプラットフォームの裏側にもネットワークの区画割りは存在します（多くの場合、それはAWSなどのクラウド上にあります）が、彼らが設計・運用し、利用者には見せない作りになっています。利用者に見えるのは「デプロイ」という1つの操作だけです。</p>
+<p>これは責任範囲の線引きの違いです。Netlify/Vercelは「ネットワークを考えなくていい代わりに、構成を自由に決めることもできない」というトレードオフを提供しており、だからこそ静的サイトでは速く進みます。一方でAWSを自分で組むと、「このデータベースはインターネットから到達する経路そのものを持たない」という状態を自分の設計として保証できます。フロントエンドでは秘密の値をクライアントに渡さないことで守りますが、AWSでは「そもそも到達する道がない」ことで守る、という違いです。</p>
+<h2>よくある勘違い</h2>
+<blockquote class="misconception">
+<p><strong>勘違い</strong>: Public SubnetとPrivate Subnetは、AWSが用意している2種類のSubnetである。
+<strong>実際は</strong>: どちらも同じSubnetです。作成画面に種類を選ぶ項目はありません。あとから設定するRoute Tableがインターネットへの経路を持つかどうかで、結果的にどちらかとして振る舞います。名前に <code>public</code> と付けても何も起きません。</p>
+<p><strong>勘違い</strong>: VPCを作ってEC2を置けば、インターネットからアクセスできる。
+<strong>実際は</strong>: VPCは塀に囲まれた土地であり、初期状態では外部との通信経路がありません。到達させるにはInternet Gatewayと、それを向くRoute Tableの設定が必要です（第6章）。</p>
+<p><strong>勘違い</strong>: Private Subnetのリソースは完全に孤立していて、何とも通信できない。
+<strong>実際は</strong>: 同じVPC内の他のSubnetとは通信できます。外部から入ってこられないだけです。さらに、Private Subnetから外部へ出ていく通信だけを許可する仕組みも別途あります（第7章のNAT Gateway）。</p>
+<p><strong>勘違い</strong>: VPCのCIDRは何でもよいので、あとから広げればよい。
+<strong>実際は</strong>: 作成時に決めたCIDRブロックは基本的に縮小できません（追加のCIDRを足す機能はありますが、最初から余裕を持った <code>/16</code> を取るのが定石です）。また、社内の別ネットワークと将来接続する可能性がある場合、アドレス範囲が重複しないよう最初に決めておく必要があります。</p>
+<p><strong>勘違い</strong>: 1つのSubnetを複数のアベイラビリティゾーンにまたがって作れば、まとめて管理できる。
+<strong>実際は</strong>: Subnetは必ず1つのAZの中に収まります。複数のAZを使いたい場合は、AZごとにSubnetを作ります。</p>
+</blockquote>
+<h2>この章で覚えるべきポイント</h2>
+<ul>
+<li class="task"><input type="checkbox"> VPCは、AWS上に作る自分専用の隔離された仮想ネットワークであり、作成時にCIDRブロック（本書では <code>10.0.0.0/16</code>）を指定する</li>
+<li class="task"><input type="checkbox"> CIDRの <code>/16</code> <code>/24</code> はサブネットマスクであり、数字が大きいほどアドレス範囲は狭くなる</li>
+<li class="task"><input type="checkbox"> <code>10.x.x.x</code> はプライベートIPアドレスの範囲であり、インターネット上では使われない。外と通信するにはパブリックIPアドレスが別に必要になる</li>
+<li class="task"><input type="checkbox"> SubnetはVPCを切り分けた区画で、EC2やRDSは必ずどれかのSubnetの中に置かれる</li>
+<li class="task"><input type="checkbox"> Subnetは必ず1つのアベイラビリティゾーンの中に作られ、複数のAZにまたがれない</li>
+<li class="task"><input type="checkbox"> Public / Private の違いはSubnetの種類ではなく、関連付けたRoute Tableがインターネットへの経路を持つかどうかで決まる</li>
+</ul>
+<aside class="saa">
+<h3>Solutions Architect Associate ではこう問われる</h3>
+<p>VPCとSubnetそのものより、「この構成で通信できないのはなぜか」という形で出るほうが多い領域です。まず<strong>Public / Private の区別がRoute Tableで決まる</strong>ことを押さえてください。「Subnetの種類をPublicに変更する」という選択肢は誤りです。</p>
+<p>次に、<strong>Subnetは単一AZに属する</strong>という前提からの出題があります。「ALBを配置したい」「RDSのサブネットグループを作りたい」という状況では2つ以上のAZのSubnetが必要になるため、「別のAZにSubnetを追加する」が正解になりやすい形です。</p>
+<p>CIDRでは <code>/16</code> と <code>/24</code> のどちらが広いかが問われます。数字が小さいほうが広い、と即答できるように。既存のオンプレミス環境と接続する設問では「アドレス範囲の重複」が原因として問われます。</p>
+</aside>
+<hr />
+<p><strong>次の章</strong>: <a href="#ch-06">第6章 Internet GatewayとRoute Table — 正門とカーナビ</a> — 土地と区画は用意できました。しかしこのままでは外の道路とつながっていません。なぜつながらないのか、何を足せばつながるのかを見ていきます。</p>
+</section>
+<section id="ch-06">
+<p class="eyebrow">第6章</p>
+<h1>第6章 Internet GatewayとRoute Table — 正門とカーナビ</h1>
+<blockquote class="lead">
+<p><strong>この章でわかること</strong></p>
+<ul>
+<li>なぜVPCを作ってEC2を置いただけではインターネットにつながらないのかを説明できる</li>
+<li>IGWをアタッチしただけでは通信が通らない理由をRoute Tableの中身から説明できる</li>
+<li>「Public Subnetとは何か」をたとえではなく定義として説明できる</li>
+<li>EC2がインターネットと通信するために経路のほかに何が必要かを説明できる</li>
+</ul>
+<p><strong>前の章とのつながり</strong>: 第5章でVPC（<code>10.0.0.0/16</code>）とSubnet（<code>10.0.1.0/24</code> / <code>10.0.2.0/24</code>）を作りましたが、「この時点ではインターネットから一切到達できない」と書いたまま終わっています。この章でその続きを解きます。</p>
+</blockquote>
+<h2>なぜこれが必要なのか</h2>
+<p>第5章の最後で、Public Subnetと名付けたSubnetにEC2を起動し、プライベートIPアドレス <code>10.0.1.42</code> も割り当てられました。ところがブラウザから接続しても何も返ってきません。土地を借り、区画を引き、建物を建て、名前も <code>public</code> と付けたのにです。</p>
+<p>本書全体で最も重要な問いはここです。<strong>なぜVPCを作っただけではインターネットにつながらないのか。</strong> そしてもう一段深く、<strong>なぜ「正門」であるInternet Gatewayを建てただけでも、まだつながらないのか。</strong> この問いに答えられると、AWSのネットワークは「サービス名の羅列」から「原因と結果でつながった仕組み」に変わります。逆にここを飛ばすと、原因の切り分けができません。</p>
+<h2>まずはざっくり: 中学生にもわかる説明</h2>
+<p>前の章で借りた土地は、周りを塀で囲われています。まず必要なのは、塀に穴を開けて門を作ることです。この門がInternet Gatewayです。</p>
+<p>ところが、門を建てただけでは誰も出入りしません。土地の中にいる人が「外に行くにはあの門を通ればいい」ということを知らないからです。荷物を持った配達員が、どこへ届ければいいか分からず立ち尽くしている状態です。</p>
+<p>必要なのは敷地の中に<strong>道路標識を立てること</strong>、「ここではないどこか宛ての荷物は、あの門から出なさい」という標識です。これがRoute Tableで、区画ごとに立てます。表の区画には立て、奥の区画には立てません。</p>
+<p>つまり、外とつながる区画とそうでない区画の違いは、<strong>建物の種類でも区画の名前でもなく、その区画に立っている標識の内容</strong>なのです。</p>
+<h2>身近なたとえ</h2>
+<p>Internet Gatewayは敷地の正門です。VPCという土地に1つ取り付けますが、門はそこにあるだけで通行を管理も許可もしません。</p>
+<p>Route Tableはカーナビ、あるいは道路標識です。表の区画のカーナビには「敷地内の宛先は敷地内で完結。それ以外は全部、正門へ」と書いてあります。奥の区画のカーナビには「敷地内の宛先は敷地内で完結」としかないので、外へは出られません。門を建てる作業とカーナビに行き先を書き足す作業は<strong>別々</strong>なのです。</p>
+<p>なお、この章で扱うのは「どの道を通るか」だけで、通ろうとした人の身元を確認する係員は第8章のSecurity Group（門番）です。<strong>門と門番は別物</strong>です。</p>
+<h2>技術的にはこういうこと</h2>
+<p><strong>Internet Gateway。</strong> IGW（Internet Gateway）とは、VPCとインターネットの間で通信を成立させるためのVPCコンポーネントで、1つのVPCにつき1つアタッチ（接続）します。AWSが運用を代行する<strong>マネージド</strong>な仕組みで、冗長化（一部が壊れても全体が止まらない構成）されています。役割は、Route Tableの出口として指定できるようになることと、プライベートIPアドレスとパブリックIPアドレスの相互変換です（パブリックIPを持つリソース1つに対する1対1の変換です。第7章で扱うNAT Gatewayの、多数のプライベートIPを1つのパブリックIPにまとめる変換とは別物です）。</p>
+<p>重要なのは、<strong>IGWをアタッチした瞬間には、まだ何の通信も変化しない</strong>という点です。「出口として指定できる対象」が1つ増えただけです。</p>
+<p><strong>Route Table。</strong> Route Table（ルートテーブル）とは、「宛先IPアドレスの範囲」と「渡す先（ターゲット）」の対応表です。通信を発信すると、発信元Subnetに関連付けられたRoute Tableが参照され、最も適合する行が選ばれます。VPCを作ると<strong>メインルートテーブル</strong>が1つ自動作成されます。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Destination（宛先）</th>
+<th>Target（渡す先）</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>10.0.0.0/16</code></td>
+<td><code>local</code></td>
+<td>最初からある</td>
+</tr>
+<tr>
+<td><code>0.0.0.0/0</code></td>
+<td><code>igw-0a1b2c3d4e5f6a7b8</code></td>
+<td>自分で追加する</td>
+</tr>
+</tbody>
+</table></div>
+<p>これが答えです。<strong>デフォルトでは1行目、VPC内部宛て（<code>10.0.0.0/16</code>）の <code>local</code> 経路しか存在しません。</strong> <code>local</code> は「VPCの中で完結して届ける」という意味の予約された指定です。</p>
+<p>EC2が <code>10.0.2.30</code>（同じVPC内のRDS）へ通信すればこの行に一致して届きます。しかしインターネット上のアドレス宛てでは一致する行がありません。<strong>行き先が分からない通信は破棄されます。</strong> これが「VPCを作っただけではつながらない」の正体で、だから2行目の追加が必要なのです。</p>
+<p><code>0.0.0.0/0</code> は「すべてのIPアドレス」を表すCIDR表記で（<code>/0</code> は何も固定しない＝全部）、<strong>デフォルトルート</strong>と呼びます。Route Tableは最も長く一致する行を優先するため、<code>10.0.0.0/16</code> 宛てはそちらが使われ、残りすべてが <code>0.0.0.0/0</code> の行に落ちてIGWへ渡されます。<code>local</code> 経路は削除も変更もできません。</p>
+<p><strong>そして、Public Subnetの定義。</strong> Route Tableは作っただけでは使われず、<strong>どのSubnetがそれを参照するのか</strong>を明示的に関連付ける必要があります（AWSでは Subnet associations と呼びます）。ここまでを整理すると、定義が導けます。</p>
+<blockquote>
+<p><strong>Public Subnetとは、<code>0.0.0.0/0</code> の宛先がInternet Gatewayを向いているRoute Tableが関連付けられたSubnetのことです。</strong></p>
+</blockquote>
+<p>Subnetの種類でも名前でもなく、関連付けられたRoute Tableの中身だけが、そのSubnetをPublicにします。逆に<strong>Private Subnetとは、そのようなRoute Tableが関連付けられていないSubnet</strong>のことです。第5章で「Route Tableで性質が決まる」と書いたのは、このことでした。</p>
+<p><strong>もう1つ必要なもの、パブリックIPアドレス。</strong> 経路が通っても、EC2自身がパブリックIPアドレスを持たなければ通信できません。自動で割り当てられるプライベートIPアドレス（<code>10.0.1.42</code>）はインターネット上に存在せず、外部から返信を送りようがないからです。起動時の「パブリックIPの自動割り当て」は手軽ですが、<strong>停止して再起動すると別のアドレスに変わります</strong>。<strong>Elastic IP（EIP）</strong>なら固定でき、停止・起動をまたいでも変わりません。</p>
+<p>まとめると、通信の成立には次の3条件が必要です。</p>
+<pre class="figure"><code>       Internet
+          │
+          ▼
+    Internet Gateway            (1) IGW attached to VPC
+          │
+┌─────────┴────── VPC 10.0.0.0/16 ─────────┐
+│                                          │
+│  Route Table (public)                    │
+│    10.0.0.0/16  ► local                  │
+│    0.0.0.0/0    ► igw-xxxx               │  (2) route added
+│          │                               │
+│          │  associated                   │  (3) associated
+│          ▼                               │
+│  ┌─── Public Subnet 10.0.1.0/24 ───────┐ │
+│  │   EC2 (App)                         │ │
+│  │     private IP 10.0.1.42            │ │
+│  │     public  IP 54.xxx.xxx.xxx       │ │  ◄── public IP required
+│  └─────────────────────────────────────┘ │
+│                                          │
+└──────────────────────────────────────────┘
+</code></pre>
+<p>この3つが揃って初めてSubnetはPublicになり、さらにEC2がパブリックIPを持ってようやく外と通信できます。1つ欠ければ成立しません。</p>
+<h2>AWSでの具体例</h2>
+<p>マネジメントコンソール（AWSの管理画面）での作業は5つです。</p>
+<p><strong>1. Internet Gatewayを作成してアタッチする。</strong> 作成直後の State は <code>Detached</code> で何の役にも立ちません。<code>my-app-vpc</code> にアタッチすると <code>Attached</code> になり、<code>igw-0a1b2c3d4e5f6a7b8</code> というIDが使えます。</p>
+<p><strong>2. Route Tableを作成する。</strong> 名前は <code>my-app-public-rt</code>、VPCは <code>my-app-vpc</code>。この時点では <code>10.0.0.0/16 → local</code> の1行だけです。</p>
+<p><strong>3. 経路を追加する。</strong> Destination に <code>0.0.0.0/0</code>、Target に Internet Gateway（<code>my-app-igw</code>）を指定して保存します。</p>
+<p><strong>4. Subnetに関連付ける（Subnet associations）。</strong> <code>my-app-public-1a</code>（<code>10.0.1.0/24</code>）を選んで保存します。<strong>この操作を忘れるのが最も多い設定漏れです。</strong> 関連付けのないSubnetは暗黙的にメインルートテーブル（<code>local</code> のみ）を使い続け、Privateのままになります。<code>10.0.2.0/24</code> には何もしません。<code>local</code> だけのままにしておく、それがPrivateだということです。</p>
+<p><strong>5. EC2にパブリックIPを持たせる。</strong> 起動時に Auto-assign public IP を <code>Enable</code> にし、Public IPv4 address に値が入っていれば成功です。固定するなら Elastic IP を関連付けます。</p>
+<p>ここまで設定してもHTTPでアクセスできないなら、残る原因は本章の範囲外、<strong>Security Group</strong>（第8章）が80番・443番ポートを許可していないケースです。経路が通っていることと通信が許可されていることは、別のレイヤーの話です。</p>
+<h2>フロントエンド開発との関係</h2>
+<p>Netlify や Vercel にAstroプロジェクトをデプロイすると、ビルドが終わった瞬間にURLが発行され世界中からアクセスできます。Route Tableを触った覚えも <code>0.0.0.0/0</code> と入力した覚えもないはずです。</p>
+<p>「デプロイしたら勝手に公開される」のは当たり前ではありません。素のAWSでは、IGWの作成とアタッチ、Route Tableの作成、経路の追加、Subnetへの関連付け、パブリックIPの付与という5つの独立した操作が必要です。Netlify/Vercelは、これらを済ませたインフラの上にあなたの <code>dist/</code> を置いているのです。</p>
+<p>これは「Vercelは楽で、AWSは面倒」という話ではなく、<strong>デフォルトがどちら側に寄っているか</strong>の違いです。Netlify/Vercelは「公開する」用途に特化しているので公開がデフォルト。AWSは公開しないものも大量に扱うため、<strong>何もしなければ何も通らない</strong>のがデフォルトです。</p>
+<p>これはフロントエンドの <code>NEXT_PUBLIC_</code> プレフィックスの発想に近く、明示的に宣言したものだけが公開されます。AWSでは <code>0.0.0.0/0 → igw-xxxx</code> という1行が、その公開宣言にあたります。</p>
+<h2>よくある勘違い</h2>
+<blockquote class="misconception">
+<p><strong>勘違い</strong>: Internet GatewayをVPCにアタッチすれば、VPC内のリソースはインターネットと通信できる。
+<strong>実際は</strong>: アタッチしただけでは何も変わりません。<code>0.0.0.0/0 → igw-xxxx</code> を追加し、そのRoute TableをSubnetに関連付けて初めて経路が成立します。</p>
+<p><strong>勘違い</strong>: Internet Gatewayは通信を許可・拒否するファイアウォールである。
+<strong>実際は</strong>: IGWは可否を判断しません。どの通信を通すかを決めるのはSecurity Group（第8章）です。IGWは門であり、門番ではありません。</p>
+<p><strong>勘違い</strong>: Subnetの名前を <code>public</code> にしたので、そこはPublic Subnetである。
+<strong>実際は</strong>: 名前は人間向けのタグです。Public Subnetとは「<code>0.0.0.0/0</code> がIGWを向くRoute Tableが関連付けられたSubnet」のことです。</p>
+<p><strong>勘違い</strong>: 経路さえ通っていれば、EC2はインターネットと通信できる。
+<strong>実際は</strong>: EC2自身がパブリックIPアドレス（またはElastic IP）を持つ必要があります。プライベートIPアドレスしか持たなければ、外部から返信を届ける宛先がありません。</p>
+</blockquote>
+<h2>この章で覚えるべきポイント</h2>
+<ul>
+<li class="task"><input type="checkbox"> デフォルトのRoute Tableには <code>10.0.0.0/16 → local</code> しかなく、行き先が分からない通信は破棄されるため外部と通信できない</li>
+<li class="task"><input type="checkbox"> Internet Gatewayは1つのVPCに1つアタッチするが、それだけでは通信は変化しない</li>
+<li class="task"><input type="checkbox"> インターネットへ出るには <code>0.0.0.0/0 → igw-xxxx</code> を追加する。<code>0.0.0.0/0</code> は「すべての宛先」を意味するデフォルトルート</li>
+<li class="task"><input type="checkbox"> Route TableはSubnetに関連付けて初めて有効になる。関連付け忘れが最も多い設定漏れ</li>
+<li class="task"><input type="checkbox"> Public Subnetとは、<code>0.0.0.0/0</code> がIGWを向くRoute Tableが関連付けられたSubnetのことである</li>
+<li class="task"><input type="checkbox"> 経路に加えEC2にはパブリックIPまたはElastic IPが必要。通信の許可・拒否はSecurity Group（第8章）という別レイヤーが担う</li>
+</ul>
+<aside class="saa">
+<h3>Solutions Architect Associate ではこう問われる</h3>
+<p>「EC2にインターネットからアクセスできない。原因はどれか」という<strong>トラブルシューティング型</strong>で頻出します。IGW未アタッチ、<code>0.0.0.0/0</code> の経路がない、Route TableがSubnetに未関連付け、パブリックIPがない、Security Groupが該当ポートを許可していない。この5つを切り分けられるかが問われます。</p>
+<p>「IGWもRoute Tableも正しい」とあれば答えはパブリックIPかSecurity Group側、「Subnetを作ってEC2を置いたが通信できない」だけなら経路追加が正解になりやすい形です。</p>
+<p>また経路選択では<strong>より長い（具体的な）プレフィックスが優先される</strong>という原則も問われます。<code>10.0.0.0/16 → local</code> と <code>0.0.0.0/0 → igw</code> が併存する場合、VPC内宛ては必ず <code>local</code> が使われます。</p>
+</aside>
+<hr />
+<p><strong>次の章</strong>: <a href="#ch-07">第7章 NAT Gateway — 中から外へだけ出る通用口</a> — 表の区画は外とつながりました。では奥の区画のサーバーが外部からライブラリを取得したいときはどうするのか。「外から入れないが、中から出られる」を実現する仕組みを見ていきます。</p>
+</section>
+<section id="ch-07">
+<p class="eyebrow">第7章</p>
+<h1>第7章 NAT Gateway — 中から外へだけ出る通用口</h1>
+<blockquote class="lead">
+<p><strong>この章でわかること</strong></p>
+<ul>
+<li>Private Subnet に置いたサーバーが「外に出られない」と何が困るのかを説明できる</li>
+<li>NAT Gateway が Public Subnet に置かれる理由と、通信がどの順に流れるかを説明できる</li>
+<li>NAT（Network Address Translation）が何を書き換えているのか、なぜ外から入れないのかを説明できる</li>
+<li>NAT Gateway に Elastic IP が必要な理由と、コストが発生する要素を説明できる</li>
+</ul>
+<p><strong>前の章とのつながり</strong>: 第6章で「Public Subnet とは、<code>0.0.0.0/0</code> が Internet Gateway を向く Route Table が関連付けられた Subnet のことだ」と定義しました。この章では、その Route Table を持たない Private Subnet 側の話に進みます。</p>
+</blockquote>
+<h2>なぜこれが必要なのか</h2>
+<p>Private Subnet は「インターネットから直接アクセスされない区画」でした。データベースや内部APIのように、外から触られては困るものを置く場所です。ではそのサーバーは、OSのセキュリティアップデートや <code>npm install</code> のパッケージを、どうやって取得するのでしょうか。外部APIの呼び出しも含め、どれもサーバーの側から外へ出ていく通信です。</p>
+<p>外から入られたくはない。しかし中から外へは出たい。第6章の Internet Gateway を Private Subnet の Route Table に設定すれば外へは出られますが、それをした瞬間その Subnet は定義上 Public Subnet になり、「外から直接アクセスされない」という性質を失います。</p>
+<p>この「出るのは許可、入るのは拒否」という非対称な通信を実現する仕組みが NAT Gateway です。</p>
+<h2>まずはざっくり: 中学生にもわかる説明</h2>
+<p>建物には、玄関のように両方向に通れる出入口のほかに、非常口や店の裏の搬入口のように「中からは押せば開くけれど、外側にはノブがない」扉があります。Private Subnet に置いたサーバーがほしいのは、この後者の扉です。</p>
+<p>NAT Gateway は、その「中からしか開かない扉」をネットワークの世界で作る仕組みです。扉は敷地の表側（Public Subnet）に設置されるので、奥の区画にいる人はいったん表まで出てきてから外に出る流れになります。</p>
+<h2>身近なたとえ</h2>
+<p>NAT Gateway は<strong>通用口</strong>です。</p>
+<p>わかりやすいのは出前を頼むときです。奥の区画にいる人が外の店に注文しますが、奥に配達員は入れたくありません。そこで注文は通用口を経由して外へ出し、届いた弁当も通用口で受け取って本人のところへ運びます。外の店から見えているのは通用口だけです。</p>
+<p>そして、注文していない配達員が突然通用口から入ってくることはできません。通用口が通すのは<strong>こちらが出した注文に対する返事</strong>だけで、この性質が NAT Gateway の一番大事な部分です。</p>
+<h2>技術的にはこういうこと</h2>
+<p><strong>NAT Gateway</strong> は、Private Subnet 内のリソースがインターネットへ向けて発信する通信を中継し、その戻りの通信だけを内側へ返す AWS のマネージドサービスです。マネージドサービスとは、サーバーの用意・冗長化・パッチ適用といった運用作業を AWS 側が担当してくれるサービスを指します。</p>
+<p><strong>NAT は何を変換しているのか。</strong> NAT は <strong>Network Address Translation</strong>（ネットワークアドレス変換）の略で、パケットに書かれた<strong>送信元のIPアドレスを書き換える</strong>仕組みです。第5章で見たとおり <code>10.0.2.0/24</code> のようなプライベートIPアドレスはインターネット上では使えません（世界中で重複しており、返事の宛先として成立しない）。そこで NAT Gateway は、届いたパケットの送信元を自分が持つパブリックIPアドレスに書き換えてから送り出します。</p>
+<pre class="figure"><code>  Server (10.0.2.10)      NAT Gateway (Public IP)      Internet
+
+  (1) request : outbound
+        │  src=10.0.2.10        │  src=&lt;Public IP&gt;        │
+        ├──────────────────────►├────────────────────────►│
+
+  (2) reply : inbound  (flows right to left)
+        │  dst=10.0.2.10        │  dst=&lt;Public IP&gt;        │
+        │◄──────────────────────┤◄────────────────────────┤
+
+  (3) new connection from outside
+        │                       │◄────────────────────────┤
+        │      (X) dropped : no matching entry            │
+</code></pre>
+<p>（凡例）(1) は中から外への通信で、送信元IPが <code>10.0.2.10</code> からパブリックIPへ書き換えられ
+ます。(2) はその戻りで、右から左へ流れ、宛先IPがパブリックIPから <code>10.0.2.10</code> へ戻されま
+す。(1) と (2) は矢印の向きが逆なので、変換されるアドレスも送信元と宛先で入れ替わります。
+(3) は外部から NAT Gateway へ直接来る新規接続で、対応表に記録がないため NAT Gateway の
+手前で破棄され、内側には届きません。</p>
+<p>NAT Gateway は「どの内部アドレスの、どの<strong>ポート</strong>（1台のコンピューター上で複数の通信を区別する番号）から出た通信か」を対応表として記憶しています。戻りのパケットが届くと、この対応表を引いて元のサーバーへ転送します。</p>
+<p><strong>なぜ外から入れないのか。</strong> インターネット側から NAT Gateway のパブリックIP宛にいきなりパケットが届いても、それが <code>10.0.2.10</code> 宛なのか <code>10.0.2.20</code> 宛なのかを判断する材料がありません。つまり「拒否する設定をしている」のではなく、<strong>仕組みとして外部からの新規接続を成立させられない</strong>のです。</p>
+<p><strong>配置と経路。</strong> ここが最も間違えやすい点です。<strong>NAT Gateway は Public Subnet に置きます。</strong> NAT Gateway 自身がインターネットへ出ていく必要があり、そのためには <code>0.0.0.0/0</code> が Internet Gateway を向く Route Table、すなわち Public Subnet に所属していなければならないからです。</p>
+<pre class="figure"><code>            Internet
+               │
+               ▼
+      ┌─── Internet Gateway ───┐        ▲ (3) IGW ► Internet
+      │                        │
+┌─────┴────────── VPC ─────────┴─────┐
+│ 10.0.0.0/16                        │
+│                                    │
+│  ┌─── Public Subnet 10.0.1.0/24 ─┐ │
+│  │   NAT Gateway (Elastic IP)    │ │  ◄── ここが本章の主題
+│  │   EC2 (Web)                   │ │
+│  └───────────────────────────────┘ │
+│                 ▲                  │  ▲ (2) Private ► NAT GW
+│                 │                  │
+│  ┌─── Private Subnet 10.0.2.0/24 ┐ │
+│  │   Server (App / RDS)          │ │  ▲ (1) outbound start
+│  └───────────────────────────────┘ │
+│                                    │
+└────────────────────────────────────┘
+</code></pre>
+<p>（凡例）(1) Private Subnet のサーバーが外向きに発信 → (2) Private Subnet の Route Table
+により NAT Gateway へ → (3) Public Subnet の Route Table により IGW からインターネットへ。
+戻りは同じ経路を逆向きにたどります。</p>
+<p>なお第5〜8章では説明を単純にするため EC2 を Public Subnet に置いています。上の図で Private Subnet に描いているのは、第9章で EC2 を移す先、あるいは第10章で扱う RDS のようなリソースだと考えてください。</p>
+<p><strong>Elastic IP とコスト。</strong> NAT Gateway の作成には <strong>Elastic IP</strong> の割り当てが必須です。Elastic IP とは、AWS が払い出す固定のパブリックIPアドレスで、明示的に解放しない限り変わらないものを指します。送信元アドレスとして書き換える先が決まっていなければ変換ができないため、省略できません。</p>
+<p>また NAT Gateway は無料ではなく、<strong>起動している時間に対する課金</strong>と、<strong>通過したデータ量に対する処理課金</strong>の2つがかかります。金額は変動するため書きませんが、置いておくだけで課金が続く点は覚えておいてください。</p>
+<h2>AWSでの具体例</h2>
+<p><strong>1. NAT Gateway を作成する。</strong> VPC の画面で「NAT ゲートウェイ」を作成し、Subnet に <code>10.0.1.0/24</code>（<strong>Public Subnet を選ぶ</strong>）、Connectivity type に <code>Public</code> を指定し、「Elastic IP を割り当て」で新規に割り当てます。作成されると <code>nat-0a1b2c3d...</code> のようなIDが振られます。</p>
+<p><strong>2. Private Subnet の Route Table にデフォルトルートを追加する。</strong> Private Subnet に関連付けられた Route Table を次の状態にします（<code>local</code> の行は VPC 作成時からある内部通信用の経路なので、追加するのは2行目だけです）。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Destination</th>
+<th>Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>10.0.0.0/16</code></td>
+<td><code>local</code></td>
+</tr>
+<tr>
+<td><code>0.0.0.0/0</code></td>
+<td><code>nat-0a1b2c3d...</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>3. Public Subnet 側の Route Table は変更しない。</strong> 第6章の時点ですでに <code>0.0.0.0/0 → igw-0a1b2c3d...</code> が入っているはずで、NAT Gateway はこの経路に相乗りして外へ出ます。</p>
+<p>つまり Route Table が2種類（Public 用と Private 用）必要になります。第6章までは1種類で足りていましたが、この章から使い分けが始まります。</p>
+<h2>フロントエンド開発との関係</h2>
+<p>Netlify や Vercel にリポジトリを繋いでデプロイすると、ビルドサーバー上で <code>npm install</code> が走り、npm レジストリという外部のサーバーへ通信します。<strong>外から入られる必要はまったくないが、外へ出る必要は必ずある</strong>という、この章とまったく同じ構図です。</p>
+<p>そのビルドサーバーに外部から SSH でログインすることはできませんが、それでも <code>npm install</code> は成功します。プラットフォーム側が「出ていく通信だけを通す」経路を用意しているからで、AWS でそれを自分で組むと NAT Gateway になる、という関係です。Next.js の Route Handlers から外部APIを叩く場合も同じで、Vercel では意識しなくても通っていた外向き通信が、AWS では「部品を1つ足して経路を作る作業」として顔を出します。</p>
+<h2>よくある勘違い</h2>
+<blockquote class="misconception">
+<p><strong>勘違い</strong>: NAT Gateway は Private Subnet に置く。
+<strong>実際は</strong>: Public Subnet に置きます。NAT Gateway 自身が <code>0.0.0.0/0 → igw-xxxx</code> の Route Table を使って外へ出る必要があるためです。</p>
+<p><strong>勘違い</strong>: NAT Gateway を置くと、Private Subnet のサーバーに外部からアクセスできるようになってしまう。
+<strong>実際は</strong>: できません。外部から届いた新規の接続は対応表に記録がなく、どこへ転送すべきか判断できないため破棄されます。</p>
+<p><strong>勘違い</strong>: NAT Gateway があれば Internet Gateway は不要になる。
+<strong>実際は</strong>: 両方必要です。NAT Gateway は中継役に過ぎず、VPC とインターネットの境界を担うのは Internet Gateway です。</p>
+<p><strong>勘違い</strong>: NAT Gateway を作れば通信が通るようになる。
+<strong>実際は</strong>: Private Subnet の Route Table に <code>0.0.0.0/0 → nat-xxxx</code> を追加して初めて経路が成立します。設置と経路設定は別作業です。</p>
+<p><strong>勘違い</strong>: NAT Gateway は無料で置いておける。
+<strong>実際は</strong>: 起動時間に対する課金と、通過データ量に対する処理課金がかかります。学習用の VPC では使い終わったら削除してください。</p>
+</blockquote>
+<h2>この章で覚えるべきポイント</h2>
+<ul>
+<li class="task"><input type="checkbox"> Private Subnet のサーバーも、OSアップデートや <code>npm install</code> のために「外へ出る」必要がある</li>
+<li class="task"><input type="checkbox"> NAT Gateway は <strong>Public Subnet</strong> に置き、Elastic IP の割り当てが必須である</li>
+<li class="task"><input type="checkbox"> Private Subnet の Route Table で <code>0.0.0.0/0 → nat-xxxx</code> を設定して初めて経路が通る</li>
+<li class="task"><input type="checkbox"> NAT は Network Address Translation の略で、送信元IPアドレスを書き換えている</li>
+<li class="task"><input type="checkbox"> 外から入れないのは、対応表にない通信の転送先が判断できないためである</li>
+<li class="task"><input type="checkbox"> NAT Gateway には時間課金とデータ処理課金があり、放置すると費用が発生し続ける</li>
+</ul>
+<aside class="saa">
+<h3>Solutions Architect Associate ではこう問われる</h3>
+<p>まず問われるのは配置です。「Private Subnet の EC2 がインターネット上のリポジトリにアクセスできない」状況で、NAT Gateway が Private Subnet に置かれている、あるいは Route Table の設定が抜けている、という原因を選ばせる形式が典型です。<strong>NAT Gateway は Public Subnet、Elastic IP 必須</strong>をセットで覚えてください。</p>
+<p>次に Internet Gateway との役割の違いです。「外部から接続を受ける必要はなく、外向き通信だけ許可したい」という要件なら NAT Gateway が正解です。逆に「インターネットから直接アクセスさせたい」なら Public Subnet と Internet Gateway になります。</p>
+<p>もう1つ、NAT インスタンス（EC2 に自分で NAT を構成する旧来の方式）との対比もあります。可用性（システムが停止せずに使える度合い）と運用負荷の観点からは、AWS が管理する NAT Gateway が推奨される選択肢です。</p>
+</aside>
+<hr />
+<p><strong>次の章</strong>: <a href="#ch-08">第8章 Security Group — どの通信を通すかの門番</a> — 道は通りました。しかし、道が通っていることと「その通信を通してよい」ことは別問題です。次はその判断を担う部品を見ていきます。</p>
+</section>
+<section id="ch-08">
+<p class="eyebrow">第8章</p>
+<h1>第8章 Security Group — どの通信を通すかの門番</h1>
+<blockquote class="lead">
+<p><strong>この章でわかること</strong></p>
+<ul>
+<li>Route Table で道が通っているのに、なぜさらに許可設定が必要なのかを説明できる</li>
+<li>Security Group がステートフルであること、許可ルールのみであることを説明できる</li>
+<li>Security Group が Subnet 単位ではなくリソース単位で効くことを説明できる</li>
+<li>ソースに別の Security Group を指定する書き方と、その利点を説明できる</li>
+</ul>
+<p><strong>前の章とのつながり</strong>: 第6章と第7章で、Internet Gateway・Route Table・NAT Gateway を使って「通信の道」を作りました。しかし道が通っているだけでは、まだ通信は成立しません。</p>
+</blockquote>
+<h2>なぜこれが必要なのか</h2>
+<p>第6章で Route Table に <code>0.0.0.0/0 → igw-xxxx</code> を書き、第7章で Private Subnet からの外向き経路も作りました。これで EC2 にブラウザからアクセスできるはず、と思ってURLを叩いても、多くの場合いつまでも応答が返ってきません。道は通っているのに、です。</p>
+<p>仮に道さえ通っていれば全通信が届くとしたら、世界中の誰もがあなたのサーバーの SSH のポート（22番、サーバーに遠隔ログインするための入口）に到達できることになります。データベースのポートにも、開発用に立ち上げた3000番にも、です。</p>
+<p><strong>道が通っていること</strong>と、<strong>その通信を通してよいか</strong>は、別々に決められるべきものです。この後者を担当するのが Security Group です。第6章までが「どこへ向かうか」の話だったのに対し、この章は「そもそも入れるか」の話になります。</p>
+<h2>まずはざっくり: 中学生にもわかる説明</h2>
+<p>大きなオフィスビルを想像してください。ビルの前まで道路が通っていて、誰でも建物の前までは来られます。しかし建物の入口には人が立っていて、名簿を持っています。</p>
+<p>その人が見ているのは<strong>入れる人のリスト</strong>だけで、「この人は入れない」という追い出しリストは持っていません。名簿に載っていなければ、それだけで入れないからです。</p>
+<p>もう1つ。中の人が外に出てまた戻ってくるとき、いちいち名簿は確認されません。行きを確認したなら、帰りは自動で通してもらえます。</p>
+<p>そしてこの人が立っているのは、敷地の入口ではなく<strong>建物ごとの入口</strong>です。同じ敷地に建物が3つあれば、それぞれの入口に別の名簿を持った人が立ちます。</p>
+<h2>身近なたとえ</h2>
+<p>Security Group は<strong>建物の入口に立つ門番</strong>です。</p>
+<p>第6章で Internet Gateway を「敷地の正門」と呼びました。門を通れば敷地には入れますが、その先、建物に入るには門番のチェックを受けなければなりません。この2段構えが VPC のセキュリティの基本形です。</p>
+<p>門番は建物ごとに立ちます。事務所の門番と金庫室の門番は別人で、別のリストを持っています。金庫室の門番のリストには「事務所から来た人だけ」と書いてあり、正門を通ってきた人であってもそれ以外は入れません。</p>
+<h2>技術的にはこういうこと</h2>
+<p><strong>Security Group</strong> は、AWS のリソースに対する仮想的なファイアウォールです。ファイアウォールとは、通信を検査して通すか通さないかを判断する仕組みを指します。特徴は次の4つです。</p>
+<p><strong>1. リソース（ENI）単位で効く。</strong> Security Group は Subnet ではなく<strong>リソースに対して</strong>紐付きます。正確には <strong>ENI（Elastic Network Interface）</strong>、つまりリソースが持つ仮想的なネットワークカードに適用されます。そのため、同じ Subnet に置いた2台の EC2 にまったく違うルールを設定できますし、異なる Subnet のリソースへ同じ Security Group を割り当てることもできます。「Subnet を分けたからルールも分かれる」という関係ではありません。</p>
+<pre class="figure"><code>┌─── Public Subnet 10.0.1.0/24 ──────────────────┐
+│   ┌── EC2 (Web) ──┐      ┌── EC2 (Batch) ──┐   │
+│   │  ENI ► app-sg │      │  ENI ► batch-sg │   │
+│   │  allow 80/443 │      │  no 80/443      │   │
+│   └───────────────┘      └─────────────────┘   │
+└────────────────────────────────────────────────┘
+</code></pre>
+<p>（凡例）同じ Subnet 内でも、リソースごとに別の Security Group を割り当てられます。左の EC2 は80番・443番を許可し、右は許可していません。</p>
+<p><strong>2. 許可（allow）ルールしか書けない。</strong> 書けるのは「通してよい通信」だけで、「この通信を拒否する」というルールは存在しません。制限のように見えますが、何も書かなければ何も通らないため、<strong>書き忘れが「うっかり全開放」にはならない</strong>という安全側の設計です。デフォルトではインバウンド（外から入ってくる通信）は何も許可されていません。なお、ステートレスに動作し拒否ルールも書ける <strong>Network ACL</strong> という別の仕組みが Subnet 単位で存在しますが、本書では扱いません。</p>
+<p><strong>3. ステートフルである。</strong> <strong>ステートフル</strong>とは、通信の状態（どの通信がすでに始まっているか）を記憶して判断することを指します。ブラウザから EC2 の443番へリクエストが届き、インバウンドルールで443番が許可されていれば通ります。そして EC2 がレスポンスを返すとき、<strong>その戻りはアウトバウンドルールを確認せずに自動的に通ります</strong>。逆方向も同じで、<code>npm install</code> の外向き通信がアウトバウンドで許可されていれば、返ってくるパッケージのデータはインバウンドに何も書かなくても届きます。<strong>「行きと帰りの両方を許可設定する必要がある」というのは誤りです。</strong></p>
+<pre class="figure"><code>     Internet                      EC2 + SG
+        │  Request dst:443            │
+        ├────────────────────────────►│  Inbound 443 : ALLOW
+        │  Response                   │
+        │◄────────────────────────────┤  Outbound : not checked
+</code></pre>
+<p>（凡例）インバウンドで443番を許可すれば、その応答はアウトバウンドの設定を確認されずに返ります。</p>
+<p><strong>4. ルールの中身。</strong> インバウンド／アウトバウンドの各ルールは、<strong>プロトコル</strong>（通信の方式。Web の通信は TCP）、<strong>ポート</strong>（用途を区別する番号。HTTP は80、HTTPS は443、SSH は22、MySQL は3306）、<strong>ソース</strong>（どこから来た通信を許可するか）で構成されます。</p>
+<p>ソースの書き方は2つ。1つは <strong>CIDR 表記</strong>（<code>0.0.0.0/0</code> は「すべて」、<code>203.0.113.10/32</code> は「この1つのIPアドレスだけ」）。もう1つが重要で、<strong>別の Security Group の ID を指定できます</strong>。この場合「その Security Group が割り当てられたリソースから来た通信」という意味になり、EC2 が増減してIPが変わっても設定を直す必要がありません。</p>
+<h2>AWSでの具体例</h2>
+<p>Web サーバーとデータベースの2階層を想定した、最小構成のインバウンドルールです。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>SG</th>
+<th>Protocol</th>
+<th>Port</th>
+<th>Source</th>
+<th>意図</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>app-sg (EC2)</td>
+<td>TCP</td>
+<td>80 / 443</td>
+<td><code>0.0.0.0/0</code></td>
+<td>誰でも閲覧できる</td>
+</tr>
+<tr>
+<td>app-sg (EC2)</td>
+<td>TCP</td>
+<td>22</td>
+<td><code>203.0.113.10/32</code></td>
+<td>管理者のIPのみ</td>
+</tr>
+<tr>
+<td>db-sg (RDS)</td>
+<td>TCP</td>
+<td>3306</td>
+<td><code>app-sg</code>（SG ID）</td>
+<td>Web サーバーからのみ</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>SSH（22番）のソースを <code>0.0.0.0/0</code> にしないでください。</strong> 世界中からのログイン試行を受け付けることを意味します。自分の接続元IPアドレスを <code>/32</code>（1アドレスだけ）で指定するのが基本です。</p>
+<p>3306番のソースに CIDR ではなく <code>app-sg</code> を指定しているのがポイントです。「app-sg が付いているリソースからだけ通す」という意味になり、Web サーバーを何台に増やしてもこのルールを書き換える必要がありません。</p>
+<pre class="figure"><code>   Internet
+      │
+      │ 80 / 443 : from 0.0.0.0/0
+      │ 22       : from 203.0.113.10/32
+      ▼
+  ┌── EC2 ──┐
+  │  app-sg │
+  └─────────┘
+      │
+      │ 3306 : from app-sg        ◄── source = SG ID
+      ▼
+  ┌── RDS ──┐
+  │  db-sg  │
+  └─────────┘
+</code></pre>
+<p>アウトバウンドはデフォルトで「すべて許可」のルールが1つ入っており、多くの場合そのままで構いません。</p>
+<h2>フロントエンド開発との関係</h2>
+<p>Vercel の設定画面にある Deployment Protection やパスワード保護は、「誰にこのデプロイを見せるか」を決める設定です。AWS でそれに相当する、もっと低いレイヤーの設定が Security Group だと考えてください。Vercel では画面のトグル1つだったものが、AWS ではポート番号とソースIPを自分で書く作業になります。</p>
+<p>ここで気をつけたいのが <strong>CORS との違い</strong>です。CORS（Cross-Origin Resource Sharing）でエラーが出たとき、通信は届いています。リクエストはサーバーまで到達しレスポンスも返っており、その上でブラウザがJavaScriptからのアクセスを拒否している状態です。CORS はブラウザ側のルール、Security Group はサーバーに届く前のネットワーク層のルールで、別のレイヤーです。CORS エラーを Security Group で直すことはできません。</p>
+<h2>よくある勘違い</h2>
+<blockquote class="misconception">
+<p><strong>勘違い</strong>: Security Group では、行きの通信と帰りの通信の両方を許可設定しなければならない。
+<strong>実際は</strong>: 必要ありません。Security Group はステートフルなので、インバウンドで443番を許可すれば、そのレスポンスはアウトバウンドの設定に関係なく返せます。</p>
+<p><strong>勘違い</strong>: 特定のIPアドレスからのアクセスを Security Group で拒否できる。
+<strong>実際は</strong>: できません。Security Group には許可ルールしか書けず、「許可リストに載せない」ことが唯一の拒否手段です。</p>
+<p><strong>勘違い</strong>: Security Group は Subnet に設定するものだ。
+<strong>実際は</strong>: リソース（正確には ENI）に紐付きます。同じ Subnet 内の EC2 でも別のルールを持てますし、Subnet をまたいで同じ Security Group を使い回すこともできます。</p>
+<p><strong>勘違い</strong>: Route Table で経路を作ったのだから、通信は届くはずだ。
+<strong>実際は</strong>: Route Table は「どの道を通るか」、Security Group は「通してよいか」で、別のレイヤーです。両方が揃って初めて通信が成立します。</p>
+<p><strong>勘違い</strong>: ソースには IPアドレスしか書けない。
+<strong>実際は</strong>: 別の Security Group の ID を指定できます。「app-sg が付いたリソースから」と書けるため、台数が変動してもルールを固定できます。</p>
+</blockquote>
+<h2>この章で覚えるべきポイント</h2>
+<ul>
+<li class="task"><input type="checkbox"> Route Table（道が通っているか）と Security Group（通してよいか）は別レイヤーである</li>
+<li class="task"><input type="checkbox"> Security Group は<strong>ステートフル</strong>で、許可した通信の戻りは自動的に通る</li>
+<li class="task"><input type="checkbox"> Security Group には<strong>許可ルールのみ</strong>書ける。拒否ルールは存在しない</li>
+<li class="task"><input type="checkbox"> Security Group は Subnet 単位ではなく<strong>リソース（ENI）単位</strong>で適用される</li>
+<li class="task"><input type="checkbox"> ソースには CIDR のほか、別の Security Group ID を指定できる</li>
+<li class="task"><input type="checkbox"> SSH（22番）のソースは <code>0.0.0.0/0</code> にせず、管理者のIPアドレスに限定する</li>
+</ul>
+<aside class="saa">
+<h3>Solutions Architect Associate ではこう問われる</h3>
+<p>最頻出は <strong>Security Group と Network ACL の区別</strong>です。ステートフル／ステートレス、許可のみ／許可と拒否、リソース単位／Subnet 単位の3点セットで対比されます。本書では Network ACL を扱いませんが、この3点の違いは押さえておくと有利です。</p>
+<p>次に多いのが<strong>多層構成のソース指定</strong>です。「Web サーバーからのみデータベースにアクセスさせたい」という要件には、RDS 側の Security Group のソースに EC2 側の Security Group ID を指定する選択肢が正解になります。CIDR でIPレンジを書く選択肢は、要件を満たしていても最適解として扱われないことが多いです。</p>
+<p>「戻りの通信をアウトバウンドで許可する」という選択肢は、ステートフルの性質から誤りになります。この引っかけは頻出です。</p>
+</aside>
+<hr />
+<p><strong>次の章</strong>: <a href="#ch-09">第9章 ALBとAuto Scaling — 受付係と、人手の自動増減</a> — ネットワークの土台が完成しました。次はその上で、EC2 が1台では足りなくなったときにどうするかを見ていきます。</p>
+</section>
+<section id="ch-09">
+<p class="eyebrow">第9章</p>
+<h1>第9章 ALBとAuto Scaling — 受付係と、人手の自動増減</h1>
+<blockquote class="lead">
+<p><strong>この章でわかること</strong></p>
+<ul>
+<li>EC2が1台だけの構成では何が困るのかを説明できる</li>
+<li>ALB（Application Load Balancer）がリクエストをどう振り分けるかを説明できる</li>
+<li>Auto Scalingが台数をどう自動調整するか、ALBとどう連携するかを説明できる</li>
+<li>この章を境にEC2をPublic SubnetからPrivate Subnetへ移せる理由を説明できる</li>
+</ul>
+<p><strong>前の章とのつながり</strong>: 第8章までで、Security Groupという門番を立てた1台のEC2にPublic Subnet経由でアクセスできる状態まで来ました。この章では、そのEC2を「複数台」に増やし、リクエストを振り分ける仕組みを導入します。</p>
+</blockquote>
+<h2>なぜこれが必要なのか</h2>
+<p>第5章から第8章までの構成では、EC2はPublic Subnetに1台だけ置かれていました。この構成には2つの弱点があります。ひとつは、そのEC2が停止するとサイト全体が止まってしまうこと（単一障害点）。もうひとつは、アクセスが増えたときに1台では処理しきれなくなることです。</p>
+<p>では単純にEC2を2台に増やせば解決するかというと、そうはいきません。ユーザーはexample.comという1つのアドレスにアクセスするだけなので、「2台のうちどちらに振り分けるか」を判断する係が必要です。さらに、アクセス数は常に一定ではなく、時間帯によって増減します。台数を人手で毎回調整するのは現実的ではありません。「複数台に振り分ける仕組み」と「台数そのものを自動で調整する仕組み」の両方が必要になります。</p>
+<h2>まずはざっくり: 中学生にもわかる説明</h2>
+<p>お店を1人で切り盛りしていると、お客さんが増えたときに対応しきれません。そこで、まず「受付」を置いて、来店したお客さんを空いているスタッフのところへ案内するようにします。さらに、混雑する時間帯にはスタッフを増やし、空いている時間帯には減らす店長がいれば、常に適切な人数で店を回せます。この「受付」がALB、「店長」がAuto Scalingにあたります。</p>
+<h2>身近なたとえ</h2>
+<p>ALBは「受付・案内係」です。お客さん（リクエスト）が来ると、今どのスタッフ（EC2）が対応可能かを見て、空いている窓口へ案内します。Auto Scalingは「混雑に応じてスタッフを増減する店長」です。忙しくなればスタッフ（EC2）を増やすよう手配し、暇になれば減らします。受付とスタッフはどちらも敷地（VPC）の中にいますが、受付は表の区画（Public Subnet）に立って外からのお客さんを迎え、スタッフ自身は奥の区画（Private Subnet）で働くことができます。</p>
+<h2>技術的にはこういうこと</h2>
+<p>ALB（Application Load Balancer）は、HTTP/HTTPSといったアプリケーション層（レイヤー7）の通信を複数のEC2インスタンスへ振り分けるロードバランサーです。ALBには次の3つの要素が登場します。</p>
+<ul>
+<li><strong>リスナー（Listener）</strong>: ALBがどのポート・プロトコル（例: 80番でHTTP、443番でHTTPS）で通信を受け付けるかの設定です。</li>
+<li><strong>ターゲットグループ（Target Group）</strong>: 振り分け先となるEC2インスタンスの集まりです。ALBはリクエストをターゲットグループ内のインスタンスに分配します。</li>
+<li><strong>ヘルスチェック（Health Check）</strong>: ターゲットグループ内の各EC2に対して、ALBが定期的に「正常に応答するか」を確認する仕組みです。応答がないEC2は振り分け先から自動的に外され、復旧すれば自動的に戻されます。</li>
+</ul>
+<p>ここで重要なのは、<strong>ALB自身が台数を増減させるわけではない</strong>という点です。台数の管理を担うのはAuto Scaling Group（ASG）です。ASGは「最小台数・希望台数・最大台数」といった条件と、CPU使用率などの指標に基づくスケーリングポリシーを持ち、条件に応じてEC2インスタンスを起動・終了します。ASGが新しいEC2を起動すると、そのインスタンスは自動的にALBのターゲットグループに登録され、ヘルスチェックを通過した時点から振り分け対象に加わります。つまり「ALBが振り分け、ASGが台数を管理し、両者はターゲットグループを介してつながっている」という2段構えの仕組みです。</p>
+<p>このAuto Scalingは<strong>水平スケーリング</strong>（台数を増やす）であり、1台のスペックを上げる<strong>垂直スケーリング</strong>（例: EC2のインスタンスタイプをより高性能なものに変更する）とは区別されます。垂直スケーリングには上限があり、また変更時にインスタンスの再起動が必要になることが多いのに対し、水平スケーリングは台数を増減するだけなので、稼働させたまま柔軟に対応しやすいという特徴があります。</p>
+<p>ここで3つの用語を整理します。<strong>可用性（Availability）</strong>とは、システムが停止せずに使える状態をどれだけ維持できるかを指します。1台のEC2が壊れても他のEC2が応答を続けられれば可用性が高いといえます。<strong>スケーラビリティ（Scalability）</strong>とは、負荷の増減に応じて処理能力を調整できる度合いを指します。<strong>冗長化（Redundancy）</strong>とは、同じ役割を持つ構成要素を複数用意しておき、一部が壊れても全体が止まらないようにしておくことです。ALBとAuto Scalingを組み合わせたEC2複数台構成は、この3つすべてを底上げする仕組みです。</p>
+<p>なお、ALBは1つのAZ（Availability Zone。第5章で触れた「Subnetは1つのAZに属する」という区分の単位）のSubnetだけでは動作せず、<strong>異なる2つ以上のAZにまたがるSubnetを指定する必要があります</strong>。これは、AZ自体が丸ごと利用できなくなった場合でも受付機能を止めないための仕組みです。本章の図は説明のためにAZを省略した簡略図であり、実運用では複数AZでの構成が前提になります（AZの詳細は第17章で扱います）。</p>
+<p>ALBを導入すると、EC2への直接アクセスはALB経由に一本化できます。これにより、EC2はPublic Subnetに置いて自らインターネットと直接やり取りする必要がなくなり、<strong>Private Subnetへ移すことができます</strong>。EC2のSecurity Group（門番。本書では <code>app-sg</code> と呼びます）は、それまで許可していた「インターネットからの80番」ではなく、「<strong>ALBのSecurity Group（<code>alb-sg</code>）からの80番のみ許可</strong>」に変更します。外部からの通信は必ずALBを経由し、EC2自体はインターネットから直接見えない状態になります。</p>
+<pre class="figure"><code>        User (Browser)
+              │
+              ▼
+         Route 53
+              │
+              ▼
+            ALB                        ◄── ここが本章の主題
+      (Listener: 80/443)
+      (Target Group + Health Check)
+         ┌────┴────┐
+         ▼         ▼
+       EC2        EC2                  ◄── ここが本章の主題
+      (Auto Scaling Groupが台数管理)
+</code></pre>
+<p>ALBはPublic Subnetの2つ以上のAZに配置し、EC2はPrivate Subnetへ移動しています。</p>
+<pre class="figure"><code>            Internet
+               │
+               ▼
+      ┌─── Internet Gateway ───┐
+      │                        │
+┌─────┴────────── VPC ─────────┴─────┐
+│ 10.0.0.0/16                        │
+│                                    │
+│  ┌─── Public Subnet 10.0.1.0/24 ─┐ │
+│  │   ALB                         │ │  ◄── ここが本章の主題
+│  │   NAT Gateway                 │ │
+│  └───────────────────────────────┘ │
+│                 │                  │
+│                 ▼                  │
+│  ┌─── Private Subnet 10.0.2.0/24 ┐ │
+│  │   EC2  (App / Auto Scaling)   │ │  ◄── ここが本章の主題
+│  │   RDS  (Database)             │ │
+│  └───────────────────────────────┘ │
+│                                    │
+└────────────────────────────────────┘
+</code></pre>
+<p>ALBは2つ以上のAZのSubnetにまたがって配置する必要があります（本図は簡略図）。EC2はAuto Scaling Groupの管理下でPrivate Subnetに置かれます。</p>
+<h2>AWSでの具体例</h2>
+<p>実際にAWSでこの構成を組む場合は、次のような設定を行います。</p>
+<ul>
+<li>EC2 コンソールで<strong>ターゲットグループ</strong>を作成し、プロトコルとポート（例: HTTP / 80）を指定する。</li>
+<li><strong>Application Load Balancer</strong>を作成し、Public Subnetのうち2つ以上のAZにまたがるSubnetを選択する。</li>
+<li>ALBの<strong>リスナー</strong>に80番（必要に応じて443番）を設定し、転送先として先ほどのターゲットグループを指定する。</li>
+<li>ターゲットグループに<strong>ヘルスチェックパス</strong>（例: <code>/health</code>）を設定し、正常応答の判定条件を決める。</li>
+<li><strong>起動テンプレート（Launch Template）</strong>でEC2の設定（AMI、インスタンスタイプ、Security Group）を定義し、それを使う<strong>Auto Scaling Group</strong>を作成する。</li>
+<li>Auto Scaling Groupに「最小1台・希望2台・最大5台」のような台数条件と、CPU使用率などに基づくスケーリングポリシーを設定する。</li>
+<li>Auto Scaling GroupにALBのターゲットグループを関連付け、起動したEC2が自動的に登録されるようにする。</li>
+<li>EC2のSecurity Group（<code>app-sg</code>）のインバウンドルールを、ALBのSecurity Group（<code>alb-sg</code>）からの80番のみ許可に変更する。</li>
+</ul>
+<h2>フロントエンド開発との関係</h2>
+<p>Vercel・NetlifyでNext.jsのサーバーレス関数やSSRページをデプロイすると、アクセス集中時に自動的にスケールしてくれます。利用者は「今何台の実行環境が動いているか」を意識する必要がありません。AWSでALBとAuto Scalingを自分で構成するということは、Vercel/Netlifyが裏側で自動的にやっていた「振り分け」と「台数調整」を、自分でターゲットグループやスケーリングポリシーとして明示的に設定する作業に相当します。自由度が上がる一方、ヘルスチェックの設計やスケーリング条件のチューニングは自分の責任になります。</p>
+<h2>よくある勘違い</h2>
+<blockquote class="misconception">
+<p><strong>勘違い</strong>: ALBがEC2の台数を増やしたり減らしたりしている。
+<strong>実際は</strong>: 台数を管理するのはAuto Scaling Groupです。ALBは振り分けとヘルスチェックのみを担当し、ASGが起動したEC2をターゲットグループに登録することで両者がつながります。</p>
+<p><strong>勘違い</strong>: Auto Scalingは1台のスペックを上げる仕組みである。
+<strong>実際は</strong>: Auto Scalingは台数を増減させる水平スケーリングです。スペックを上げる垂直スケーリングとは別の仕組みです。</p>
+<p><strong>勘違い</strong>: ALBは1つのSubnetに置けば動作する。
+<strong>実際は</strong>: ALBは異なる2つ以上のAZのSubnetを指定する必要があります。1つのAZが利用できなくなっても受付機能を止めないためです。</p>
+<p><strong>勘違い</strong>: EC2をPrivate Subnetに移すと、ユーザーはサイトにアクセスできなくなる。
+<strong>実際は</strong>: ユーザーからのリクエストは常にALB（Public Subnet）を経由するため、EC2自体がPrivate Subnetにあってもアクセスは成立します（EC2のSecurity Group <code>app-sg</code> はALBのSecurity Group <code>alb-sg</code> からの通信のみ許可）。EC2への直接アクセスができなくなるだけです。</p>
+<p><strong>勘違い</strong>: ヘルスチェックに失敗したEC2は、二度と振り分け対象に戻らない。
+<strong>実際は</strong>: ヘルスチェックは継続的に行われるため、EC2が復旧して正常応答するようになれば、再びターゲットグループの振り分け対象に戻ります。</p>
+</blockquote>
+<h2>この章で覚えるべきポイント</h2>
+<ul>
+<li class="task"><input type="checkbox"> ALBはL7（HTTP/HTTPS）のロードバランサーであり、リスナー・ターゲットグループ・ヘルスチェックの3要素を持つ</li>
+<li class="task"><input type="checkbox"> ALB自身は台数を増減させず、台数管理はAuto Scaling Groupが担う</li>
+<li class="task"><input type="checkbox"> Auto Scalingは水平スケーリング（台数増減）であり、垂直スケーリング（スペック向上）とは区別される</li>
+<li class="task"><input type="checkbox"> ALBは2つ以上のAZのSubnetが必要である</li>
+<li class="task"><input type="checkbox"> ALB導入後、EC2はPrivate Subnetへ移し、EC2のSecurity Group（<code>app-sg</code>）はALBのSecurity Group（<code>alb-sg</code>）からの通信のみを許可する</li>
+<li class="task"><input type="checkbox"> 「可用性」「スケーラビリティ」「冗長化」の意味を説明できる</li>
+</ul>
+<aside class="saa">
+<h3>Solutions Architect Associate ではこう問われる</h3>
+<p>ALBとAuto Scalingの役割分担（振り分けはALB、台数管理はASG）を混同させる選択肢が頻出します。また、ALBのマルチAZ要件（2つ以上のAZが必須）や、水平スケーリングと垂直スケーリングの違いを問う設問もよく見られます。可用性を高める設計問題では、「単一AZ・単一インスタンス構成」を誤りの選択肢として、「複数AZにまたがるALB + Auto Scaling Group」を正解として選ばせるパターンが典型的です。EC2をPrivate Subnetに置きつつALB経由でのみ公開する構成も、セキュリティ設計の定番パターンとして問われます。</p>
+</aside>
+<hr />
+<p><strong>次の章</strong>: <a href="#ch-10">第10章 RDS — データを預かる金庫</a> — EC2が複数台に増えた今、データはどこに置くべきかという問いに進みます。</p>
+</section>
+<section id="ch-10">
+<p class="eyebrow">第10章</p>
+<h1>第10章 RDS — データを預かる金庫</h1>
+<blockquote class="lead">
+<p><strong>この章でわかること</strong></p>
+<ul>
+<li>EC2にデータベースを同居させると何が困るのかを説明できる</li>
+<li>RDSが「マネージドサービス」であるとはどういうことかを説明できる</li>
+<li>RDSをどこに配置し、どんな通信だけを許可するかを説明できる</li>
+</ul>
+<p><strong>前の章とのつながり</strong>: 第9章でEC2は複数台に増え、Private Subnetへ移りました。複数台のEC2が同時に動く以上、データはどこか1台のEC2の中ではなく、共有できる場所に置く必要があります。</p>
+</blockquote>
+<h2>なぜこれが必要なのか</h2>
+<p>もしデータベースを1台のEC2の中に同居させていたらどうなるでしょうか。まず、第9章でEC2を複数台に増やしてAuto Scalingで自動増減させるようになると、どのEC2が「本物のデータ」を持っているのかが曖昧になります。あるEC2に書き込んだデータが、別のEC2からは見えないという不整合が起きてしまいます。さらに、Auto Scalingによって不要になったEC2が終了（削除）されるとき、そのEC2の中にデータがあれば、それも一緒に消えてしまいます。つまり、「複数台で共有できて、EC2の増減とは独立して存在し続けるデータの置き場所」が必要です。</p>
+<h2>まずはざっくり: 中学生にもわかる説明</h2>
+<p>お店のスタッフを増やしたり減らしたりするようになったとき、売上の記録を特定のスタッフの手帳にメモしていたら、そのスタッフが辞めた瞬間に記録も失われてしまいます。そこで、記録は建物の奥にある専用の金庫室にまとめて保管し、どのスタッフもその金庫室を見に行けばよい、という形にします。スタッフの人数がどう変わっても、金庫室の中身は影響を受けません。RDSはこの金庫室にあたります。</p>
+<h2>身近なたとえ</h2>
+<p>RDS（Relational Database Service）は「金庫室・書庫」です。敷地（VPC）の奥の区画（Private Subnet）に置かれ、事務所（EC2）で働くスタッフたちが必要なときに出し入れします。この金庫室には専門の管理人がついていて、書類の補修や複製、緊急時の復旧といった作業を代行してくれます。この「専門の管理人がついている」という部分が、後で説明する「マネージド」の意味に対応します。</p>
+<h2>技術的にはこういうこと</h2>
+<p>RDS（Relational Database Service）は、MySQLやPostgreSQLといったリレーショナルデータベースをAWS上で運用するための<strong>マネージドサービス</strong>です。マネージドサービスとは、利用者が自分でサーバーにデータベースソフトをインストールして運用する代わりに、OSやミドルウェアのセットアップ・パッチ適用・バックアップ取得・障害発生時の復旧といった運用作業の多くをAWS側が代行してくれるサービスの形態を指します。EC2上に自分でMySQLを入れて運用することもできますが、その場合はセキュリティパッチの適用やバックアップの取得、障害時の切り分けまですべて自分で行う必要があります。RDSではこれらの多くをAWSに任せられます。</p>
+<p>RDSは、第9章までの構成と同様にPrivate Subnetに置きます。直接さらされてはいけない情報を扱うため、インターネットから直接アクセスされない場所に置くのが原則です。RDSへのアクセスは、EC2のSecurity Group（門番）からの通信のみに限定します。送信元にIPアドレスの範囲ではなく「EC2のSecurity Group」そのものを指定できる点が、EC2同士の通信を許可する際によく使われる方法です。</p>
+<p>RDSを配置する際には、<strong>DBサブネットグループ</strong>という設定が必要です。これはRDSインスタンスをどのSubnet群に配置してよいかを定義するもので、<strong>2つ以上のAZにまたがるSubnetを含める必要があります</strong>。これは第9章で説明したALBのマルチAZ要件と同じ理由で、1つのAZが利用できなくなった場合に備えるためです。ただし、本章で扱う構成自体は1つのRDSインスタンスを前提とした簡略図であり、実際に複数AZで自動的に待機系を用意する仕組みは「Multi-AZ」という機能によって実現されます。Multi-AZの詳細は第17章で扱いますが、ここでは「同一AZに障害が起きてもデータベースを継続利用できるようにする仕組みが別途存在する」という名前だけ押さえておいてください。</p>
+<pre class="figure"><code>            Internet
+               │
+               ▼
+      ┌─── Internet Gateway ───┐
+      │                        │
+┌─────┴────────── VPC ─────────┴─────┐
+│ 10.0.0.0/16                        │
+│                                    │
+│  ┌─── Public Subnet 10.0.1.0/24 ─┐ │
+│  │   ALB                         │ │
+│  │   NAT Gateway                 │ │
+│  └───────────────────────────────┘ │
+│                 │                  │
+│                 ▼                  │
+│  ┌─── Private Subnet 10.0.2.0/24 ┐ │
+│  │   EC2  (App / Auto Scaling)   │ │
+│  │   RDS  (Database)             │ │  ◄── ここが本章の主題
+│  └───────────────────────────────┘ │
+│                                    │
+└────────────────────────────────────┘
+</code></pre>
+<p>RDSはPrivate Subnetに置かれ、DBサブネットグループは2つ以上のAZにまたがるSubnetで構成する必要があります（本図は簡略図）。</p>
+<pre class="figure"><code>       EC2 (Security Group: app-sg)
+              │  3306 (MySQL) / 5432 (PostgreSQL)
+              ▼
+       RDS  (Security Group: db-sg)
+              allow: source = app-sg only
+</code></pre>
+<p>送信元はEC2のSecurity Group（app-sg）、許可ポートはMySQLなら3306番、PostgreSQLなら5432番です。</p>
+<h2>AWSでの具体例</h2>
+<p>実際にAWSでRDSを構成する場合は、次のような設定を行います。</p>
+<ul>
+<li><strong>DBサブネットグループ</strong>を作成し、Private Subnetのうち2つ以上のAZにまたがるSubnetを登録する。</li>
+<li>RDSインスタンス作成時に、使用するデータベースエンジン（MySQL、PostgreSQLなど）とインスタンスクラス（性能・スペック）を選択する。</li>
+<li>RDS用のSecurity Groupを作成し、インバウンドルールの送信元にEC2側のSecurity Group（例: <code>app-sg</code>）を指定し、ポートをデータベースエンジンに応じたもの（3306番や5432番）に設定する。</li>
+<li>自動バックアップの保持期間やバックアップウィンドウ（バックアップを取得する時間帯）を設定する。これらの取得作業自体はAWSが自動で行う。</li>
+<li>接続先のエンドポイント（RDSに割り当てられるホスト名）をEC2側のアプリケーション設定に渡し、EC2からRDSへ接続できるようにする。</li>
+</ul>
+<h2>フロントエンド開発との関係</h2>
+<p>Supabase、PlanetScale、Vercel PostgresといったサービスをNext.jsなどのプロジェクトで使ったことがある方は、それらの体験に近いものがRDSです。これらのサービスも「データベースソフトのインストールやパッチ適用を意識せず、接続情報だけ受け取ってすぐ使える」という点でマネージドサービスの一種です。違いは、Supabaseなどがネットワーク構成まで含めて隠蔽してくれているのに対し、RDSではVPC・Subnet・Security Groupというネットワークの置き場所を自分で設計する必要がある点です。「マネージドである」という利便性は共通していますが、AWSではそれを自分の敷地の中の一部として組み込む作業が追加で発生します。</p>
+<h2>よくある勘違い</h2>
+<blockquote class="misconception">
+<p><strong>勘違い</strong>: RDSを使えば、パッチ適用やバックアップを何も考えなくてよい。
+<strong>実際は</strong>: OSやミドルウェアの管理はAWSが代行しますが、バックアップの保持期間設定やスケーリングの判断など、利用者側で決めるべき設定は残ります。「何もしなくていい」わけではなく「運用の一部を肩代わりしてもらえる」という意味です。</p>
+<p><strong>勘違い</strong>: RDSもEC2と同様にPublic Subnetに置いてもよい。
+<strong>実際は</strong>: RDSは重要なデータを扱うため、原則としてPrivate Subnetに置き、インターネットから直接アクセスできないようにします。</p>
+<p><strong>勘違い</strong>: RDSへのアクセス許可は、EC2のIPアドレスを直接指定する必要がある。DBサブネットグループも1つのSubnetだけで構成できる。
+<strong>実際は</strong>: 送信元にはEC2のSecurity Groupそのものを指定でき、IPアドレスが変わっても設定変更が不要です。またDBサブネットグループには2つ以上のAZにまたがるSubnetを含める必要があります。</p>
+<p><strong>勘違い</strong>: RDSを使えば自動的にMulti-AZになり、障害時も無停止で切り替わる。
+<strong>実際は</strong>: 複数AZでの待機系構成は「Multi-AZ」という別途有効化する機能です。RDSを使うだけで自動的に有効になるわけではありません（詳細は第17章）。</p>
+</blockquote>
+<h2>この章で覚えるべきポイント</h2>
+<ul>
+<li class="task"><input type="checkbox"> RDSはマネージドなリレーショナルデータベースサービスであり、パッチ適用・バックアップ・障害復旧の多くをAWSが代行する</li>
+<li class="task"><input type="checkbox"> EC2にデータベースを同居させると、複数台構成でのデータ不整合やEC2削除時のデータ消失が起きる</li>
+<li class="task"><input type="checkbox"> RDSはPrivate Subnetに置き、EC2のSecurity Groupからの3306番/5432番のみを許可する</li>
+<li class="task"><input type="checkbox"> DBサブネットグループは2つ以上のAZにまたがるSubnetが必要である</li>
+<li class="task"><input type="checkbox"> Multi-AZは名前だけ押さえ、詳細は第17章で学ぶ</li>
+</ul>
+<aside class="saa">
+<h3>Solutions Architect Associate ではこう問われる</h3>
+<p>「EC2にデータベースを同居させる構成」と「RDSに分離する構成」のどちらが可用性・保守性に優れるかを問う設問で、RDSへの分離が正解になりやすい形です。またDBサブネットグループのマルチAZ要件や、Security Groupの送信元にIPアドレスではなく別のSecurity Groupを指定できるという仕組みも頻出です。Multi-AZ（可用性向上）とRead Replica（読み取り性能向上。第17章以降の話題）を混同させる選択肢にも注意が必要です。</p>
+</aside>
+<hr />
+<p><strong>次の章</strong>: <a href="#ch-11">第11章 S3とSSG — ファイルを「置く」場所</a> — ここまでは「動かす」構成でしたが、次は「置くだけでよい」静的ファイルの話に移ります。</p>
+</section>
+<section id="ch-11">
+<p class="eyebrow">第11章</p>
+<h1>第11章 S3とSSG — ファイルを「置く」場所</h1>
+<blockquote class="lead">
+<p><strong>この章でわかること</strong></p>
+<ul>
+<li>S3がオブジェクトストレージであり、EC2とは役割がまったく違うことを説明できる</li>
+<li>バケット・オブジェクト・キーという基本用語を説明できる</li>
+<li>AstroなどのSSG（静的サイトジェネレーター）でビルドした <code>dist/</code> をS3に配る流れを説明できる</li>
+<li>なぜ静的サイトの配信にEC2が不要なのかを説明できる</li>
+</ul>
+<p><strong>前の章とのつながり</strong>: 第10章までは、EC2でプログラムを動かし、RDSでデータを保管する「動くアプリケーション」のための部品を見てきました。この章からは視点を変え、Astroのようなツールで事前に作り終えたファイル一式をどう配るかという話に入ります。</p>
+</blockquote>
+<h2>なぜこれが必要なのか</h2>
+<p>Astroで <code>npm run build</code> を実行すると、<code>dist/</code> フォルダの中にHTML・CSS・JavaScript・画像といった完成済みのファイルが出力されます。これらのファイルは、アクセスされるたびにサーバー側で何かを計算する必要がありません。ただ「そこにある」ものを、そのまま返せばよいだけです。</p>
+<p>そうだとすると、わざわざEC2という「コンピューター」を借りて、Nginxのようなソフトウェアをインストールしてまで配信する必要はあるのでしょうか。プログラムを実行する仕組みは不要で、ファイルを保管して必要なときに取り出せる場所さえあれば十分なはずです。この「ファイルを置くだけの場所」を担当するのがS3です。</p>
+<h2>まずはざっくり: 中学生にもわかる説明</h2>
+<p>S3は、インターネット上にある巨大な倉庫だと考えてください。段ボール箱（ファイル）を預けておくと、必要なときにその箱を取り出して誰かに渡すことができます。倉庫の管理人は、箱の中身を開けて何かを計算したりはしません。頼まれた箱をそのまま渡すだけです。</p>
+<p>Astroでサイトを作ると、<code>dist/</code> フォルダの中に「もう完成した箱」が並びます。この箱をまるごとS3という倉庫に運び込んでおけば、あとは誰かがアクセスしてきたときに、その箱を取り出して渡すだけで済みます。</p>
+<h2>身近なたとえ</h2>
+<p>S3は「巨大な倉庫・ロッカー」です。EC2が「働く人がいる事務所（建物）」だったのに対し、S3は人が働く場所ではなく、ものを預けておくだけの倉庫です。事務所では従業員が注文を受けて何かを作りますが、倉庫では預けた荷物をそのまま出し入れするだけです。この違いが、EC2とS3の役割の違いそのものです。</p>
+<h2>技術的にはこういうこと</h2>
+<p><strong>S3（Simple Storage Service）</strong>は、AWSが提供する<strong>オブジェクトストレージ</strong>です。オブジェクトストレージとは、ファイルをフォルダの階層構造ではなく「オブジェクト」という単位でフラットに保管する仕組みを指します。EC2のようにOSを起動してファイルシステムを操作するのではなく、ファイルそのものを直接預けたり取り出したりするサービスです。</p>
+<p>S3には次の基本用語があります。</p>
+<ul>
+<li><strong>バケット（bucket）</strong>: ファイルを入れる箱にあたる、S3上の保管場所の単位です。バケット名はAWS全体で一意である必要があります。</li>
+<li><strong>オブジェクト（object）</strong>: バケットの中に保存される実体（ファイル本体とその付随情報）です。</li>
+<li><strong>キー（key）</strong>: オブジェクトを一意に識別する名前です。<code>images/logo.png</code> のような文字列がキーになります。</li>
+</ul>
+<p>ここで注意が必要なのは、S3には本来「フォルダ」という実体の階層構造がないという点です。管理画面上では <code>images/</code> フォルダの中に <code>logo.png</code> があるように見えますが、実際にはキー名に <code>/</code> が含まれているだけで、見かけ上フォルダのように表示されているにすぎません。</p>
+<p>もう一つ重要な点は、<strong>S3はVPCの中に置くサービスではない</strong>ということです。第5章で見たVPCは「自分専用の土地」でしたが、S3は特定のVPCに属さず、VPCの外側にあるリージョン単位のサービスとして存在します。EC2やRDSのようにサブネットを指定して配置する対象ではありません。</p>
+<pre class="figure"><code>        Astro Project
+              │
+              ▼ astro build
+           dist/           (HTML, CSS, JS, images)
+              │
+              ▼ upload
+             S3            (bucket: my-site-bucket)
+</code></pre>
+<p>S3には<strong>静的ウェブサイトホスティング</strong>という、バケットに入れたファイルを直接Webサイトとして公開できる機能も存在します。ただし本書では、この機能を使ってバケットを直接公開するのではなく、バケットは非公開のままにし、次章で説明するCloudFrontを経由して配信する方針を取ります。理由は次章で説明します。</p>
+<h2>AWSでの具体例</h2>
+<p>Astroでのビルドから配置までの流れは、おおむね次のようになります。</p>
+<ol>
+<li>ローカルまたはCIで <code>astro build</code> を実行し、<code>dist/</code> フォルダを生成する</li>
+<li>AWS CLIを使って <code>dist/</code> の中身をS3バケットへアップロードする</li>
+</ol>
+<pre class="code"><code>$ astro build
+$ aws s3 sync dist/ s3://my-site-bucket
+</code></pre>
+<p><code>aws s3 sync</code> は、ローカルの <code>dist/</code> フォルダの内容をS3バケットの中身と同期させるコマンドです。差分だけをアップロードするため、ビルドのたびにフォルダ全体を送り直す必要はありません。</p>
+<p>バケットの設定画面では、バケットポリシー（誰がアクセスできるかのルール）やパブリックアクセスブロック（外部からの直接アクセスを一括で禁止する設定）といった項目があります。本書の方針では、バケットは非公開に設定し、外部からの直接アクセスはブロックしたままにします。</p>
+<h2>フロントエンド開発との関係</h2>
+<p>NetlifyやVercelにデプロイするとき、皆さんは「publish directory」として <code>dist</code> を指定しているはずです。あの設定でNetlify/Vercelが裏側で行っているのは、まさにこの「ビルド済みファイルをストレージに配置する」処理です。Netlify/Vercelを使っていると、その保管場所がS3なのか別の仕組みなのかを意識する必要はありません。すべて自動で行われます。</p>
+<p>AWSで同じことをする場合は、この「ビルド済みファイルをどこかに置く」という工程を自分でS3として明示的に用意し、アップロードのコマンドまで自分で実行する必要があります。裏側で当たり前に行われていた処理が、AWSでは自分の手で組み立てる部品の一つとして表に出てくるということです。</p>
+<h2>よくある勘違い</h2>
+<blockquote class="misconception">
+<p><strong>勘違い</strong>: S3はEC2の一種で、Webサーバーソフトウェアが動いている
+<strong>実際は</strong>: S3はプログラムを実行する場所ではなく、ファイルを保管するだけのオブジェクトストレージです。動的な処理は行われません。</p>
+<p><strong>勘違い</strong>: S3の中はフォルダで階層的に整理されている
+<strong>実際は</strong>: 見た目はフォルダですが、実体はキー名に含まれる <code>/</code> によって階層があるように表示されているだけです。</p>
+<p><strong>勘違い</strong>: 静的サイトを公開するにはS3の静的ウェブサイトホスティング機能を有効にすればよい
+<strong>実際は</strong>: その機能でも公開できますが、本書ではバケットを非公開にし、次章のCloudFrontを経由して配信する構成を採用します。</p>
+<p><strong>勘違い</strong>: S3はVPCの中に配置するサービスである
+<strong>実際は</strong>: S3はVPCに属さない独立したサービスです。EC2やRDSのようにサブネットを指定して配置するものではありません。</p>
+</blockquote>
+<h2>この章で覚えるべきポイント</h2>
+<ul>
+<li class="task"><input type="checkbox"> S3はオブジェクトストレージであり、EC2のようにプログラムを実行する場所ではないことを説明できる</li>
+<li class="task"><input type="checkbox"> バケット・オブジェクト・キーの意味を説明できる</li>
+<li class="task"><input type="checkbox"> S3上の「フォルダ」がキー名の <code>/</code> による見かけ上のものであることを説明できる</li>
+<li class="task"><input type="checkbox"> S3がVPCの外にある独立したサービスであることを説明できる</li>
+<li class="task"><input type="checkbox"> <code>astro build</code> で生成した <code>dist/</code> をS3へアップロードする流れを説明できる</li>
+<li class="task"><input type="checkbox"> 本書ではバケットを非公開にし、CloudFront経由で配信する方針であることを説明できる</li>
+</ul>
+<aside class="saa">
+<h3>Solutions Architect Associate ではこう問われる</h3>
+<p>S3は「オブジェクトストレージ」であり、ブロックストレージ（EBS）やファイルストレージ（EFS）と区別されて出題されます。「大量の静的ファイルを安価かつ高い耐久性で保管したい」という状況ではS3が正解になりやすい一方、「OSからマウントして使うディスク」が求められる場面ではEBSが正解になります。また、S3バケットを非公開にしたままCloudFront経由でのみアクセスさせる構成（OAC。Origin Access Control。次章で説明する、S3を非公開のままCloudFrontだけに読み取りを許可する仕組み）は頻出パターンです。バケットを直接パブリックにする静的ウェブサイトホスティングは、要件で明示されない限り推奨される構成ではない点も意識しておくとよいでしょう。</p>
+</aside>
+<hr />
+<p><strong>次の章</strong>: <a href="#ch-12">第12章 CloudFront — 世界中にコピーを配る前線基地</a> — S3に置いただけのファイルを、世界中に速く届けるための仕組みを見ていきます。</p>
+</section>
+<section id="ch-12">
+<p class="eyebrow">第12章</p>
+<h1>第12章 CloudFront — 世界中にコピーを配る前線基地</h1>
+<blockquote class="lead">
+<p><strong>この章でわかること</strong></p>
+<ul>
+<li>S3に置いただけのファイルがなぜ遅くなりうるのかを説明できる</li>
+<li>CDN・エッジロケーション・オリジン・キャッシュ・TTLといった用語を説明できる</li>
+<li>CloudFrontとS3をOAC（Origin Access Control）でつなぐ推奨構成を説明できる</li>
+<li>HTTPSがどこで終端されるか、独自ドメインの証明書がどこで必要になるかを説明できる</li>
+</ul>
+<p><strong>前の章とのつながり</strong>: 前章で、Astroがビルドした <code>dist/</code> をS3という倉庫に置くところまで進みました。この章では、その倉庫にあるファイルを、世界中のユーザーにどう速く届けるかを見ていきます。</p>
+</blockquote>
+<h2>なぜこれが必要なのか</h2>
+<p>前章でS3にファイルを置けば、そのファイルを配信すること自体はできます。しかし、S3のバケットは特定の1つの場所（リージョン）に存在します。たとえば東京リージョンにバケットを作った場合、ブラジルのユーザーがアクセスすると、リクエストとファイルのやり取りが地球の裏側との間で毎回発生し、表示までに時間がかかります。</p>
+<p>また、アクセスが増えるたびに毎回S3から同じファイルを取り出すのは無駄が多く、S3への負荷も増えていきます。同じ内容のファイルを、世界中の利用者に近い場所から素早く配れる仕組みがあれば、この問題は解決できます。それを行うのがCloudFrontです。</p>
+<h2>まずはざっくり: 中学生にもわかる説明</h2>
+<p>遠くの大きな倉庫（S3）から毎回商品を取り寄せていると、届くまでに時間がかかります。そこで、各地に小さな在庫拠点を作っておき、一度取り寄せた商品はそこに保管しておけば、次に近くの人が同じ商品を欲しがったときはすぐに渡せます。これが世界中の拠点から素早くファイルを届ける仕組み、CloudFrontの考え方です。</p>
+<h2>身近なたとえ</h2>
+<p>CloudFrontは「各地の前線倉庫・コンビニ」です。本部の大きな倉庫（S3）まで毎回買いに行くのではなく、近所のコンビニに商品が置いてあれば、そちらで受け取ったほうが早く済みます。CloudFrontは、世界中の拠点に一時的なコピーを置いておき、利用者に一番近い拠点から返答する役割を担います。</p>
+<h2>技術的にはこういうこと</h2>
+<p><strong>CloudFront</strong>は、AWSが提供する<strong>CDN（Content Delivery Network）</strong>です。CDNとは、世界中に配置された拠点にコンテンツのコピーを保持し、利用者に地理的に近い拠点から配信することで、応答速度を向上させる仕組みを指します。</p>
+<p>CDNの動きを理解するには、次の用語を押さえておく必要があります。</p>
+<ul>
+<li><strong>エッジロケーション</strong>: CloudFrontがコンテンツのコピーを保持する、世界各地の拠点です。</li>
+<li><strong>オリジン</strong>: CDNが配信する元データを持っている場所です。本書の構成ではS3バケットがオリジンにあたります。</li>
+<li><strong>キャッシュ</strong>: 一度取得したデータを一時的に保存しておき、次回以降はそのコピーを使い回す仕組みです。</li>
+<li><strong>キャッシュヒット / キャッシュミス</strong>: エッジロケーションに目的のファイルのコピーがあり、それを返せた場合を<strong>キャッシュヒット</strong>、コピーがなくオリジンまで取りに行く必要がある場合を<strong>キャッシュミス</strong>と呼びます。</li>
+<li><strong>TTL（Time To Live）</strong>: キャッシュされたデータを、次にオリジンへ確認しに行くまで保持しておく有効期限のことです。</li>
+<li><strong>レイテンシー</strong>: リクエストを送ってから応答が返るまでの遅延時間のことです。エッジロケーションが近いほど、一般にレイテンシーは小さくなります。</li>
+</ul>
+<pre class="figure"><code>        User (Browser)
+              │
+              ▼
+        CloudFront   (Edge Location: cache hit)
+              │
+              ▼  cache miss only
+            S3       (Origin)
+</code></pre>
+<p>エッジロケーションに目的のファイルのコピーがあればそのまま応答し（cache hit）、なければオリジンのS3まで取りに行きます（cache miss only）。</p>
+<p>CloudFrontとS3の接続方法には、<strong>OAC（Origin Access Control）</strong>を使う方式と、古くから使われてきたOAI（Origin Access Identity）を使う方式や、S3の静的ウェブサイトホスティング機能を使ってバケットを直接公開する方式があります。本書ではOACを推奨構成とし、S3バケットは非公開のままにして、CloudFrontだけがそのバケットを読み取れるようにする構成を採用します。OAIやバケットの直接公開は旧来方式であり、新しく構成する場合はOACを使うのが基本です。</p>
+<p>もう一つ重要な役割が、<strong>HTTPSの終端</strong>です。HTTPSとは、通信内容を暗号化してやり取りするための仕組みで、ブラウザとサーバーの間で第三者に通信内容を読み取られないようにします。この構成では、ユーザーとCloudFrontの間の通信をCloudFrontでHTTPSとして終端します。CloudFrontからS3へのアクセスは、OACによって署名されたリクエストとしてS3のHTTPSエンドポイントに送られるため、バケットを公開せずに安全に取得できます。独自ドメインでHTTPS通信を行うには証明書が必要になり、CloudFrontで使う証明書は<strong>ACM（AWS Certificate Manager）</strong>という別のサービスで発行します。ここで一点注意が必要なのは、CloudFront用のACM証明書は<strong>us-east-1（バージニア北部）リージョンで発行する</strong>必要があるという点です。証明書の詳しい扱いについては第17章で改めて触れます。</p>
+<h2>AWSでの具体例</h2>
+<p>CloudFrontのディストリビューション（配信設定の単位）を作成する際は、主に次のような項目を設定します。</p>
+<ul>
+<li>オリジンとしてS3バケットを指定する</li>
+<li>オリジンアクセスとしてOACを設定し、S3バケットポリシーでCloudFrontからのアクセスのみを許可する</li>
+<li>デフォルトのキャッシュ動作（TTLなど）を設定する</li>
+<li>独自ドメインを使う場合は、ACM（us-east-1）で発行した証明書を紐付ける</li>
+</ul>
+<pre class="figure"><code>        User (Browser)
+              │
+              ▼
+         Route 53   (DNS: example.com ► CloudFront)
+              │
+              ▼
+        CloudFront   (CDN / HTTPS / Cache)  ◄── 本章の主題
+              │
+              ▼
+            S3       (dist/ : HTML, CSS, JS, images)
+</code></pre>
+<p>ファイルを更新して再度S3にアップロードしても、TTLの期間中はエッジロケーションに古いキャッシュが残ったままになることがあります。この場合、<strong>キャッシュの無効化（Invalidation）</strong>という操作を行い、古いキャッシュを明示的に破棄させる必要があります。</p>
+<h2>フロントエンド開発との関係</h2>
+<p>NetlifyやVercelを使ってデプロイしたとき、実は皆さんのサイトもすでにCDN経由で配信されています。Netlify/Vercelにはそれぞれ独自のCDN（Vercel Edge Network、Netlify CDN）があり、ビルドが終わった瞬間にコンテンツが世界中の拠点へ配布され、さらに古いキャッシュのパージ（無効化）まで自動で行われます。</p>
+<p>AWSでこの構成を自分で組む場合、CloudFrontの設定に加えて、デプロイのたびにキャッシュの無効化を自分で実行する必要があります。Netlify/Vercelがデプロイ完了時に自動でやってくれていたキャッシュのパージが、AWSでは明示的な作業として手元に戻ってくるということです。</p>
+<h2>よくある勘違い</h2>
+<blockquote class="misconception">
+<p><strong>勘違い</strong>: CloudFrontを使わなくても、S3にファイルを置けば十分速く配信できる
+<strong>実際は</strong>: S3は特定のリージョンに存在するため、遠方のユーザーにはレイテンシーが発生します。CloudFrontのエッジロケーションを経由することで、利用者に近い場所から配信できます。</p>
+<p><strong>勘違い</strong>: S3バケットを公開設定にしてCloudFrontにつなぐのが標準的なやり方である
+<strong>実際は</strong>: 本書ではバケットを非公開にし、OACを使ってCloudFrontだけがアクセスできる構成を推奨します。バケットの直接公開は旧来方式です。</p>
+<p><strong>勘違い</strong>: ファイルを更新してS3にアップロードすれば、すぐに新しい内容が世界中に反映される
+<strong>実際は</strong>: TTLの間はエッジロケーションに古いキャッシュが残ることがあります。すぐに反映したい場合はキャッシュの無効化（Invalidation）を行う必要があります。</p>
+<p><strong>勘違い</strong>: 独自ドメインでHTTPSを使うための証明書は、CloudFrontを使うリージョンと同じ場所で発行すればよい
+<strong>実際は</strong>: CloudFront用のACM証明書は、必ずus-east-1（バージニア北部）で発行する必要があります。</p>
+</blockquote>
+<h2>この章で覚えるべきポイント</h2>
+<ul>
+<li class="task"><input type="checkbox"> CDN・エッジロケーション・オリジン・キャッシュ・TTL・レイテンシーの意味を説明できる</li>
+<li class="task"><input type="checkbox"> キャッシュヒットとキャッシュミスの違いを説明できる</li>
+<li class="task"><input type="checkbox"> CloudFrontとS3をOACでつなぎ、バケットを非公開に保つ推奨構成を説明できる</li>
+<li class="task"><input type="checkbox"> HTTPSがCloudFrontで終端されることを説明できる</li>
+<li class="task"><input type="checkbox"> 独自ドメイン用のACM証明書はus-east-1で発行する必要があることを説明できる</li>
+<li class="task"><input type="checkbox"> キャッシュの無効化（Invalidation）が何のために行われるかを説明できる</li>
+</ul>
+<aside class="saa">
+<h3>Solutions Architect Associate ではこう問われる</h3>
+<p>CloudFrontとS3の連携では、「S3バケットを非公開に保ちながらCloudFrontだけにアクセスさせたい」という状況でOACを選ばせる問題が想定されます。旧来のOAIとの違いや、バケットポリシーで直接アクセスを許可する構成との比較が問われやすいところです。また、CloudFrontで独自ドメインのHTTPSを使う場合、ACM証明書はus-east-1で発行する必要があるという条件は、リージョンの選択を問う設問として狙われやすいポイントです。キャッシュのTTLと無効化の役割の違いも整理しておきましょう。</p>
+</aside>
+<hr />
+<p><strong>次の章</strong>: <a href="#ch-13">第13章 【組み立て1】Astro静的サイトのAWS構成</a> — ここまでの部品を、静的サイト1本の構成としてつなぎ合わせます。</p>
+</section>
+<section id="ch-13">
+<p class="eyebrow">第13章</p>
+<h1>第13章 【組み立て1】Astro静的サイトのAWS構成</h1>
+<blockquote class="lead">
+<p><strong>この章でわかること</strong></p>
+<ul>
+<li>Astroなどでビルドした静的サイトをAWSで公開する構成を、Route 53・CloudFront・S3の3部品で説明できる</li>
+<li>ブラウザにURLを入力してから画面が表示されるまでの流れを、キャッシュヒット時とミス時に分けて説明できる</li>
+<li>この構成にVPC・EC2・ALB・RDSが登場しない理由を説明できる</li>
+<li><code>astro build</code> から公開までのデプロイ手順を、コマンドの並びとして説明できる</li>
+</ul>
+<p><strong>前の章とのつながり</strong>: <a href="#ch-12">第12章 CloudFront</a>までで、静的サイトを配信するために必要な部品はすべて出そろいました。この章では新しい部品を足さず、これまでの部品を1本の構成につなぎ直します。</p>
+</blockquote>
+<h2>なぜこれが必要なのか</h2>
+<p>部品を知っていることと、組み合わせて「動くWebサイト」にできることは別の能力です。Astroでビルドした <code>dist/</code> を公開したいとき、どの部品をどうつなげばよいのでしょうか。そして逆に、<strong>どの部品は使わなくてよいのでしょうか</strong>。この後者の判断が設計では一番効きます。VPCもEC2もALBもRDSもAWSの主要サービスですが、静的サイトを1本公開するだけならどれも必要ありません。</p>
+<h2>まずはざっくり: 中学生にもわかる説明</h2>
+<p>やりたいことは単純です。「あらかじめ作っておいたファイルを、見たい人に渡す」。それだけです。Astroのようなツールがページをあらかじめ完成したHTMLにしてくれるので、訪問者が来てから計算する必要がありません。</p>
+<p>必要なものは3つです。ファイルを<strong>置いておく場所</strong>、その<strong>コピーを世界中に配っておく仕組み</strong>（遠い人にも早く届けるため）、そして <code>example.com</code> という<strong>名前を聞かれたときに行き先を答える案内役</strong>です。</p>
+<p>逆に言えば、計算するためのコンピューターも、それを守る土地も、データの保管庫も出てきません。計算しないのだから、計算する場所が要らないのです。</p>
+<h2>身近なたとえ</h2>
+<p>大量のパンフレットを配る場面です。原本一式は<strong>巨大な倉庫</strong>（S3）に保管しますが、注文のたびに本社倉庫から発送していては遠方の人に届くまで時間がかかります。そこで各地の<strong>前線倉庫・コンビニ</strong>（CloudFront）にあらかじめコピーを置きます。近所の店に在庫があればその場で受け取れ、切れていれば店が本社倉庫に取り寄せて次回のため手元にも1部残します。「あの店はどこか」と尋ねられて答えるのが<strong>住所録</strong>（Route 53）です。</p>
+<p>この構成には<strong>事務所</strong>（EC2）も<strong>敷地</strong>（VPC）も<strong>受付係</strong>（ALB）も<strong>金庫室</strong>（RDS）も出てきません。働く人が要る仕事が1つもないからです。</p>
+<h2>技術的にはこういうこと</h2>
+<p>まず、この章の正本となる構成図を確認します。これは<a href="#ch-00">はじめに</a>で先に見せた図Aと同じものです。</p>
+<pre class="figure"><code>        User (Browser)
+              │
+              ▼
+         Route 53   (DNS: example.com ► CloudFront)
+              │
+              ▼
+        CloudFront   (CDN / HTTPS terminate / Cache)
+              │
+              ▼
+            S3       (dist/ : HTML, CSS, JS, images)
+</code></pre>
+<p>この3段を、ブラウザがURLを受け取った瞬間から順に追います。</p>
+<p><strong>ステップ1: 名前を住所に変える（Route 53）。</strong>
+ブラウザはまず「example.com のIPアドレスは何か」をDNS（ドメイン名とIPアドレスの対応表。<a href="#ch-03">第3章</a>）に問い合わせ、最終的な答えを持つ権威DNSサーバーであるRoute 53（<a href="#ch-04">第4章</a>）が応答します。ここで使うのが<strong>Aliasレコード</strong>です。<code>example.com</code> のようにサブドメインが付かない頂点（<strong>Zone Apex</strong>）にはDNSの仕様上CNAMEを置けないため、Aレコードの形でCloudFrontを直接指せるAliasを使います。</p>
+<p><strong>ステップ2: 近くの前線基地に接続する（CloudFront）。</strong>
+返ってきたIPアドレスはCloudFront（<a href="#ch-12">第12章</a>）の<strong>エッジロケーション</strong>（世界各地の配信拠点）のもので、<strong>ユーザーに地理的に近い拠点</strong>が返されます。ブラウザとの間はHTTPSで暗号化され、それを解いてリクエストを取り出す<strong>HTTPSの終端</strong>をCloudFrontが担当します（独自ドメインで使うACM証明書はus-east-1での発行が必要です）。</p>
+<p><strong>ステップ3: キャッシュがあるかを確認する。</strong>
+エッジロケーションは、要求されたファイルの写しを持っているかを確認します。持っていれば（<strong>キャッシュヒット</strong>）S3に問い合わせずその場で返すため、S3から見ればこのアクセスは存在しなかったのと同じです。持っていなければ（<strong>キャッシュミス</strong>）配信元である<strong>オリジン</strong>、すなわちS3に取りに行き、返すと同時に<strong>TTL</strong>（Time To Live。キャッシュを保持する秒数）の期間だけ手元にも保存します。次回はヒットになります。</p>
+<p><strong>ステップ4: オリジンから取り出す（S3 + OAC）。</strong>
+キャッシュミスのときだけ、CloudFrontはS3（<a href="#ch-11">第11章</a>）にリクエストを送ります。ここで重要なのが<strong>OAC（Origin Access Control）</strong>です。S3バケットは非公開のままにし、バケットポリシーで「このCloudFrontディストリビューションからのリクエストだけを許可する」と設定します。CloudFrontはOACで署名したリクエストを送るため非公開バケットから取得でき、入口はCloudFront1つに絞られます。</p>
+<p><strong>この構成に登場しないもの。</strong>
+経路を最後まで追っても、VPC・Subnet・Internet Gateway・Route Table・NAT Gateway・Security Group・EC2・ALB・RDSが1つも出てきませんでした。S3もCloudFrontもRoute 53も<strong>VPCの外側にあるサービス</strong>だからです。VPC（<a href="#ch-05">第5章</a>）という「自分専用に借りた土地」が必要になるのは、EC2のような自分で管理するコンピューターを置く場合だけです。土地が要らないのだから、正門（<a href="#ch-06">Internet Gateway</a>）もカーナビ（Route Table）も門番（<a href="#ch-08">Security Group</a>）も出番がありません。「EC2は動かす場所、S3は置く場所」という<a href="#ch-11">第11章</a>の区別が、構成全体の形として現れています。</p>
+<h2>AWSでの具体例</h2>
+<p>コンソールでの作業は次の順序になります。</p>
+<ol>
+<li><strong>S3バケットを作成する。</strong> パブリックアクセスはブロックしたままにし、静的ウェブサイトホスティングも有効にしません（OAC構成では不要です）。</li>
+<li><strong>CloudFrontディストリビューションを作成する。</strong> オリジンにそのS3バケットを指定し、オリジンアクセスに<strong>OAC</strong>を選択、案内されるバケットポリシーをS3側に適用します。</li>
+<li><strong>ACM証明書をus-east-1で発行し</strong>、代替ドメイン名（CNAMEs）に <code>example.com</code> を登録します。</li>
+<li><strong>Route 53でAレコードを作成し、エイリアスを有効にして</strong>CloudFrontディストリビューションを選びます。</li>
+</ol>
+<p>次に、コードを更新して公開するまでのデプロイフローです。</p>
+<pre class="figure"><code>   Local / CI (GitHub Actions)
+              │
+              ▼ astro build
+          dist/  (HTML, CSS, JS, images)
+              │
+              ▼ aws s3 sync dist/ s3://my-site-bucket
+            S3
+              │
+              ▼ aws cloudfront create-invalidation
+        CloudFront   (old cache purged)
+              │
+              ▼
+        User sees new content
+</code></pre>
+<p>コマンドとしては次の3行です。</p>
+<pre class="code"><code>$ astro build
+$ aws s3 sync dist/ s3://my-site-bucket --delete
+$ aws cloudfront create-invalidation \
+    --distribution-id E1XXXXXXXXXXXX --paths &quot;/*&quot;
+</code></pre>
+<p>1行目でHTMLを生成し、2行目で <code>dist/</code> をS3と同期します（<code>--delete</code> はローカルから消したファイルをS3側でも削除します）。3行目が<strong>キャッシュの無効化（Invalidation）</strong>です。S3を更新してもTTLの間はエッジに古い写しが残るため、明示的に破棄します。忘れると「デプロイしたのに古い画面が出る」状態になります。</p>
+<h2>フロントエンド開発との関係</h2>
+<p>上の3行で気づくのは、<strong>これがそのままCIのジョブになる</strong>ことです。GitHub Actionsで <code>main</code> へのpushをトリガーにし、<code>npm ci</code> → <code>astro build</code> → <code>aws s3 sync</code> → <code>create-invalidation</code> を順に実行すれば、Netlifyで「pushしたら自動デプロイ」と呼んでいたものと同じ体験になります。つまりNetlifyやVercelの魔法の正体は、<strong>この4ステップを自動で走らせてくれていた</strong>ことです。AWSでは同じ4ステップを自分でワークフローファイルに書きます。Netlifyの管理画面の「ビルドコマンド」「publish directory」に相当する情報を、YAMLに書き下すだけです。</p>
+<p>代わりに増える仕事もあります。CIからAWSを操作するための認証情報と権限の管理、そしてキャッシュ無効化の範囲の判断です。<code>--paths "/*"</code> で全消しするか変更ファイルだけを指定するかは自分で決めることになり、<a href="#ch-12">第12章</a>のTTL設計と一体の判断になります。</p>
+<h2>よくある勘違い</h2>
+<blockquote class="misconception">
+<p><strong>勘違い</strong>: 静的サイトでもVPCを作っておかないと、S3にファイルを置けない。
+<strong>実際は</strong>: S3・CloudFront・Route 53はいずれもVPCの外側のサービスです。VPCが必要になるのはEC2のような自分で管理するコンピューターを置く場合だけです。</p>
+<p><strong>勘違い</strong>: CloudFrontを入れたので、すべてのアクセスがS3まで届いている。
+<strong>実際は</strong>: キャッシュヒットならエッジロケーションで応答が完結し、S3にはリクエストが届きません。オリジンの負荷が下がるのはこのためです。</p>
+<p><strong>勘違い</strong>: CloudFrontを使うなら、S3バケットは公開設定にしておく必要がある。
+<strong>実際は</strong>: OACを使えばバケットは非公開のままにできます。ユーザーがS3のURLを直接叩いてもアクセスできません。</p>
+<p><strong>勘違い</strong>: <code>aws s3 sync</code> でファイルを更新すれば、すぐに新しい画面が表示される。
+<strong>実際は</strong>: TTLの間はエッジロケーションに古い写しが残ります。すぐに反映したい場合は、Invalidationでキャッシュを明示的に破棄します。</p>
+</blockquote>
+<h2>この章で覚えるべきポイント</h2>
+<ul>
+<li class="task"><input type="checkbox"> 静的サイトの構成は Route 53 → CloudFront → S3 の3段であり、EC2は登場しない</li>
+<li class="task"><input type="checkbox"> Route 53からCloudFrontへはAliasレコードで向ける</li>
+<li class="task"><input type="checkbox"> キャッシュヒットならS3には届かず、ミスのときだけオリジンのS3へ取りに行く</li>
+<li class="task"><input type="checkbox"> S3バケットは非公開のままOACでCloudFrontからのみアクセスさせる</li>
+<li class="task"><input type="checkbox"> デプロイは <code>astro build</code> → <code>aws s3 sync</code> → Invalidation の3ステップで、そのままCIに載る</li>
+<li class="task"><input type="checkbox"> VPC・IGW・NAT Gateway・Security Group・ALB・RDSが不要なのは「動かす必要がない」から</li>
+</ul>
+<aside class="saa">
+<h3>Solutions Architect Associate ではこう問われる</h3>
+<p>「静的なWebサイトを最小のコストと運用負荷で世界中に配信したい」という要件では、EC2やALBを含む選択肢を退けて<strong>S3 + CloudFront</strong>を選ばせる出題が定番です。「バケットを非公開に保ちたい」が加われば<strong>OAC</strong>が、「Zone Apexの独自ドメインを使いたい」が加われば<strong>Aliasレコード</strong>が決め手になります。CloudFront用ACM証明書のリージョン（us-east-1）も誤答を誘う条件としてよく登場します。</p>
+</aside>
+<hr />
+<p><strong>次の章</strong>: <a href="#ch-14">第14章 【組み立て2】サーバーアプリケーションのAWS構成</a> — 訪問者が来てから計算が必要になったとき、経路がどう変わるのかを見ていきます。</p>
+</section>
+<section id="ch-14">
+<p class="eyebrow">第14章</p>
+<h1>第14章 【組み立て2】サーバーアプリケーションのAWS構成</h1>
+<blockquote class="lead">
+<p><strong>この章でわかること</strong></p>
+<ul>
+<li>Next.jsのSSRやRoute Handlersのようにサーバーで計算が必要な場合の経路を、Route 53 → ALB → EC2 → RDS の順に説明できる</li>
+<li>VPC・Subnet・IGW・Route Table・NAT Gateway・Security Groupが、その経路のどこで効いているかを指し示せる</li>
+<li>Security Groupを alb-sg → app-sg → db-sg と連鎖させる設計の意味を説明できる</li>
+<li>静的アセットの配信を第13章の構成と組み合わせられることを説明できる</li>
+</ul>
+<p><strong>前の章とのつながり</strong>: <a href="#ch-13">第13章</a>では「計算しないから部品が少なくて済む」構成を見ました。この章では計算が必要になり、第5章から第10章までの部品が一斉に登場します。</p>
+</blockquote>
+<h2>なぜこれが必要なのか</h2>
+<p>ログイン状態で表示を変えたい。フォームの内容をデータベースに保存したい。こうした要件が1つでも入った瞬間、「あらかじめ作っておいたファイルを渡すだけ」では成り立たなくなります。訪問者が来てから計算する場所が必要になるからです。</p>
+<p>計算する場所を用意するとは、AWSでは「EC2というコンピューターを起動する」ことです。しかし1台立てて終わりにはなりません。どこに置くのか、外からどう届かせるのか、逆に触られては困るデータをどう守るのか。<a href="#ch-13">第13章</a>で1つも登場しなかったVPC・Subnet・Route Table・Security Groupが、ここで一斉に必要になります。</p>
+<h2>まずはざっくり: 中学生にもわかる説明</h2>
+<p>前章との違いはたった1つ、「訪問者が来てから作る」かどうかです。</p>
+<p>来てから作るなら作る人が要り、人気が出れば1人では足りないので複数人で分担します。すると「どの人に頼むか」を決める係が必要です。そして作るのに使う情報（会員名簿や注文履歴）を、誰でも触れる場所に置いておくわけにはいきません。</p>
+<p>そこでこう配置します。訪問者が最初に会う<strong>受付の人</strong>は道路に面した表側に、実際に作業する人と大事な情報が入った金庫は<strong>道路に面していない奥側</strong>に置きます。訪問者は奥まで入れず、必ず受付を通します。ただし奥にいる人も材料の取り寄せなど外に用がある場面があるので、「中からは出られるが外からは入れない通用口」を用意しておきます。</p>
+<h2>身近なたとえ</h2>
+<p>奥行きのある<strong>敷地</strong>（VPC）を借りていると考えてください。塀で囲われ、<strong>正門</strong>（Internet Gateway）が1つあります。敷地は道路に面した<strong>表の区画</strong>（Public Subnet）と、その奥の<strong>奥の区画</strong>（Private Subnet）に分かれています。</p>
+<p>表の区画には<strong>受付・案内係</strong>（ALB）が立ち、来客を空いている窓口に案内します。奥の区画には、実際に働く人がいる<strong>事務所</strong>（EC2）と、大事な書類をしまった<strong>金庫室</strong>（RDS）があります。奥は道路に面していないので、来客が直接たどり着くことはできません。</p>
+<p>各建物の入口には<strong>門番</strong>（Security Group）が立って入館証を確認します。事務所の門番は「受付から案内されてきた人だけ」を通し、金庫室の門番は「事務所の人だけ」を通します。</p>
+<p>表の区画には<strong>通用口</strong>（NAT Gateway）もあります。奥の事務所の人が資材を取り寄せたいとき、いったん表まで出てここから外に出ます。外から知らない人がこの通用口を通って入ることはできません。</p>
+<h2>技術的にはこういうこと</h2>
+<p>まず、この章の正本となる2枚の図を確認します。1枚目が全体の流れ（図B）です。</p>
+<pre class="figure"><code>        User (Browser)
+              │
+              ▼
+         Route 53
+              │
+              ▼
+            ALB        (Public Subnet)
+         ┌────┴────┐
+         ▼         ▼
+       EC2        EC2   (Private Subnet / Auto Scaling)
+         └────┬────┘
+              ▼
+            RDS        (Private Subnet)
+</code></pre>
+<p>2枚目が、その内側のネットワーク構造（図C）です。</p>
+<pre class="figure"><code>            Internet
+               │
+               ▼
+      ┌─── Internet Gateway ───┐
+      │                        │
+┌─────┴────────── VPC ─────────┴─────┐
+│ 10.0.0.0/16                        │
+│                                    │
+│  ┌─── Public Subnet 10.0.1.0/24 ─┐ │
+│  │   ALB                         │ │
+│  │   NAT Gateway                 │ │
+│  └───────────────────────────────┘ │
+│                 │                  │
+│                 ▼                  │
+│  ┌─── Private Subnet 10.0.2.0/24 ┐ │
+│  │   EC2  (App)                  │ │
+│  │   RDS  (Database)             │ │
+│  └───────────────────────────────┘ │
+│                                    │
+└────────────────────────────────────┘
+</code></pre>
+<p>この2枚を重ねながら、リクエストを追っていきます。</p>
+<p><strong>ステップ1: 名前を住所に変える（Route 53）。</strong>
+<code>example.com</code> の問い合わせにRoute 53（<a href="#ch-04">第4章</a>）が応答します。指す先がCloudFrontからALBに変わるだけで仕組みは前章と同じで、Zone Apexから指すときは<strong>Aレコードのエイリアス</strong>を使います。</p>
+<p><strong>ステップ2: 正門をくぐる（IGW + Route Table）。</strong>
+通信がVPCに入るには<strong>Internet Gateway</strong>（<a href="#ch-06">第6章</a>）が必要ですが、アタッチしただけでは成立しません。ALBが置かれたPublic Subnetに関連付けられた<strong>Route Table</strong>に <code>0.0.0.0/0 ► igw-xxxx</code> の1行があり、はじめて道が通ります。この1行があるSubnetがPublic Subnetです。</p>
+<p><strong>ステップ3: 受付で振り分けられる（ALB）。</strong>
+リクエストはPublic Subnetの<strong>ALB</strong>（<a href="#ch-09">第9章</a>）に届きます。ALBの門番 <code>alb-sg</code> がインターネット（<code>0.0.0.0/0</code>）からの80番・443番を許可しているので通過します。ALBはリスナーで受けたリクエストを<strong>ターゲットグループ</strong>に登録されたEC2へ振り分け、<strong>ヘルスチェック</strong>に失敗したEC2は自動的に振り分け先から外します。</p>
+<p><strong>ステップ4: 奥の区画で計算する（EC2 + Auto Scaling）。</strong>
+振り分け先の<strong>EC2</strong>（<a href="#ch-02">第2章</a>）はPrivate Subnetにあります。門番 <code>app-sg</code> はソースにIPアドレスではなく <strong><code>alb-sg</code> そのもの</strong>を指定して80番を許可しているため、「ALBを経由した通信だけ」が入れます。EC2が何台に増減してもルールを書き換える必要がありません。</p>
+<p>台数を管理するのは<strong>Auto Scaling Group</strong>です。ALBが増やすのではなく、Auto Scaling GroupがCPU使用率などに応じてEC2を起動・終了し、起動したEC2が自動的にターゲットグループに登録されます。これは台数を増やす<strong>水平スケーリング</strong>であり、1台のスペックを上げる垂直スケーリングとは別の仕組みです。</p>
+<p><strong>ステップ5: データを取り出す（RDS）。</strong>
+<strong>RDS</strong>（<a href="#ch-10">第10章</a>）も同じPrivate Subnetにあり、門番 <code>db-sg</code> はソースに <code>app-sg</code> を指定して3306番（PostgreSQLなら5432番）だけを許可します。</p>
+<p>ここで<strong>Security Groupの連鎖</strong>が完成します。<code>0.0.0.0/0</code> → <code>alb-sg</code> → <code>app-sg</code> → <code>db-sg</code> と、外に近いほど広く、奥ほど狭くなります。インターネットからRDSへ直接届く経路はどこにもありません。</p>
+<p><strong>戻りの通信。</strong>
+EC2が生成したHTMLをALB経由でブラウザに返すとき、戻り用の許可ルールは要りません。Security Group（<a href="#ch-08">第8章</a>）は<strong>ステートフル</strong>、つまり許可した通信の状態を記憶しているため、戻りは自動的に通ります。「行きと帰りの両方を許可設定する必要がある」というのは誤りです。</p>
+<p><strong>外向きの通信。</strong>
+<code>npm install</code> やOSのアップデート、外部API呼び出しは、EC2の側から外へ出ていく通信です。EC2はPrivate Subnetにいるのでそのままでは出られません。ここで<strong>NAT Gateway</strong>（<a href="#ch-07">第7章</a>）が効きます。Private SubnetのRoute Tableに <code>0.0.0.0/0 ► nat-xxxx</code> の行があり、通信はいったんPublic SubnetのNAT Gatewayへ向かい、そこからIGWを通って外に出ます。NAT Gatewayは送信元IPを自分のElastic IPに書き換えるため戻りは正しくEC2に返り、逆にインターネット側から新規接続を張ることは仕組み上できません。</p>
+<p><strong>この図は簡略図です。</strong>
+図Cは1つのPublic Subnetと1つのPrivate Subnetだけを描いています。実際には<strong>ALBは2つ以上のAZ（Availability Zone。同一リージョン内で電源や設備が分離された拠点）のSubnetにまたがる必要があり</strong>、<strong>RDSのDBサブネットグループにも2つ以上のAZにまたがるSubnetが必要</strong>です。実運用ではこれらのSubnetがAZごとに複製されると考えてください。</p>
+<p><strong>静的アセットとの組み合わせ。</strong>
+この構成でも、CSS・JavaScript・画像まで毎回EC2に取りに行かせる必要はありません。それらを<a href="#ch-13">第13章</a>の構成（CloudFront + S3）に載せ、HTMLを返す動的なリクエストだけをALBへ向ければEC2の負荷が下がります。2つの構成は排他ではなく組み合わせるものだと押さえておいてください。</p>
+<h2>AWSでの具体例</h2>
+<p>構築は外側から内側へ順に積み上げます。</p>
+<ol>
+<li><strong>VPC</strong>（<code>10.0.0.0/16</code>）を作成し、<strong>Internet Gateway</strong>を作ってアタッチする。</li>
+<li><strong>Subnet</strong>を作成する。Public（<code>10.0.1.0/24</code>）とPrivate（<code>10.0.2.0/24</code>）を、それぞれ2つ以上のAZに用意する。</li>
+<li><strong>Route Table</strong>を2つ作る。Public用に <code>0.0.0.0/0 ► igw-xxxx</code> を追加してPublic Subnetに関連付ける。</li>
+<li><strong>NAT Gateway</strong>を<strong>Public Subnet</strong>に作成してElastic IPを割り当て、Private用Route Tableに <code>0.0.0.0/0 ► nat-xxxx</code> を追加する。</li>
+<li><strong>Security Group</strong>を3つ作る。</li>
+</ol>
+<pre class="figure"><code>   alb-sg   inbound  80,443  from 0.0.0.0/0
+              │
+              ▼
+   app-sg   inbound  80      from alb-sg     ◄── source = SG ID
+              │
+              ▼
+   db-sg    inbound  3306    from app-sg     ◄── source = SG ID
+</code></pre>
+<ol start="6">
+<li><strong>RDS</strong>を作成する。DBサブネットグループにPrivate Subnetを2AZ分登録し、Security Groupに <code>db-sg</code> を指定する。</li>
+<li><strong>起動テンプレート</strong>でEC2の設定（AMI、インスタンスタイプ、<code>app-sg</code>）を定義し、<strong>Auto Scaling Group</strong>を作成してPrivate Subnetと台数（例: 最小1台・希望2台・最大5台）を指定する。</li>
+<li><strong>ALB</strong>を作成する。Public Subnetを2AZ分指定し、Security Groupに <code>alb-sg</code>、リスナーに80番・443番、転送先にターゲットグループを設定する。ターゲットグループにヘルスチェックパス（例: <code>/health</code>）を設定し、Auto Scaling Groupに関連付ける。</li>
+<li><strong>Route 53</strong>でAレコードのエイリアスを作成し、ALBを指す。</li>
+</ol>
+<h2>フロントエンド開発との関係</h2>
+<p>Next.jsをVercelにデプロイすると、<code>getServerSideProps</code> によるSSRも <code>app/api/</code> のRoute Handlersも、何も設定せずに動きます。しかし「どこで動いているのか」と尋ねられると、答えられないままになりがちです。</p>
+<p>この章の構成がその答えの1つです。SSRのレンダリングもRoute Handlersのリクエスト処理も、<strong>Private SubnetにいるEC2の上のNode.jsプロセス</strong>が実行しています。Vercelが「サーバーレス関数」として抽象化していた実行環境を自分で用意したのがEC2であり、そこにリクエストを届ける受付がALB、混雑に応じた台数調整がAuto Scaling Groupです。</p>
+<p>データベースも同じです。Vercel PostgresやSupabaseに接続文字列だけで繋いでいたものが、AWSでは「RDSをPrivate Subnetに置き、EC2のSecurity Groupからのみ3306番を許可する」という明示的なネットワーク設計になります。「誰が繋いでよいか」を決めているのは、自分が書いたSecurity Groupのルールです。</p>
+<p><code>npm install</code> の話は特に象徴的です。ビルドログでパッケージがダウンロードされるのを何度も見てきたはずですが、同じ外向き通信をPrivate SubnetのEC2で行うには、NAT Gatewayという有料の部品を明示的に置く必要があります。「勝手に外に出られる」のは、誰かがその経路を用意してくれていたからです。</p>
+<h2>よくある勘違い</h2>
+<blockquote class="misconception">
+<p><strong>勘違い</strong>: EC2はインターネットからアクセスされるのだから、Public Subnetに置かなければならない。
+<strong>実際は</strong>: ALBがPublic Subnetにあれば、EC2はPrivate Subnetで構いません。ユーザーはALBまでしか届かず、EC2への通信はALB経由に限定されます。</p>
+<p><strong>勘違い</strong>: アクセスが増えるとALBがEC2の台数を増やしてくれる。
+<strong>実際は</strong>: 台数を管理するのはAuto Scaling Groupです。ALBは振り分けとヘルスチェックのみを担当し、両者はターゲットグループを介してつながっています。</p>
+<p><strong>勘違い</strong>: EC2からRDSへ通信するので、EC2側のアウトバウンドとRDS側のインバウンドの両方を設定しなければならない。
+<strong>実際は</strong>: Security Groupはステートフルなので戻りの通信は自動的に通り、アウトバウンドはデフォルトで全許可です。設定が要るのはRDS側のインバウンドだけです。</p>
+<p><strong>勘違い</strong>: NAT GatewayはPrivate Subnetに置くものだ。
+<strong>実際は</strong>: NAT Gateway自身がインターネットへ出る必要があるため、<code>0.0.0.0/0</code> がIGWを向くRoute Tableを持つ<strong>Public Subnet</strong>に置きます。Private SubnetのRoute Tableが、そのNAT Gatewayを向きます。</p>
+<p><strong>勘違い</strong>: この構成にすれば、CSSや画像もEC2が高速に配信してくれる。
+<strong>実際は</strong>: 静的ファイルの配信はCloudFront + S3に任せるほうが速く、EC2の負荷も下がります。2つの構成は組み合わせて使うものです。</p>
+</blockquote>
+<h2>この章で覚えるべきポイント</h2>
+<ul>
+<li class="task"><input type="checkbox"> 経路は Route 53 → ALB（Public Subnet）→ EC2（Private Subnet）→ RDS（Private Subnet）</li>
+<li class="task"><input type="checkbox"> Public Subnetである条件は、Route Tableに <code>0.0.0.0/0 ► igw-xxxx</code> があって関連付けられていること</li>
+<li class="task"><input type="checkbox"> Security Groupは <code>0.0.0.0/0</code> → <code>alb-sg</code> → <code>app-sg</code> → <code>db-sg</code> と連鎖させ、ソースにSG IDを指定する</li>
+<li class="task"><input type="checkbox"> Security Groupはステートフルなので、戻りの通信に許可ルールは不要</li>
+<li class="task"><input type="checkbox"> Private SubnetからのnpmインストールなどはNAT Gateway（Public Subnetに配置）経由で外へ出る</li>
+<li class="task"><input type="checkbox"> ALBとRDSのDBサブネットグループは、いずれも2つ以上のAZにまたがるSubnetが必要</li>
+</ul>
+<aside class="saa">
+<h3>Solutions Architect Associate ではこう問われる</h3>
+<p>「Webサーバーをインターネットに直接公開せずに構成したい」という要件では、<strong>ALBをPublic Subnetに、EC2をPrivate Subnetに置き、EC2のSecurity GroupのソースにALBのSecurity Groupを指定する</strong>構成が定番の正解です。「Private Subnetのサーバーからパッチを取得したい」が加われば<strong>NAT Gateway（Public Subnetに配置）</strong>が、「可用性を高めたい」が加われば<strong>複数AZ構成</strong>が決め手になります。ALBとAuto Scaling Groupの役割分担、Security Groupのステートフル性、NAT Gatewayの配置場所は、いずれも誤答の選択肢として繰り返し登場する論点です。</p>
+</aside>
+<hr />
+<p><strong>次の章</strong>: <a href="#ch-15">第15章 Netlify / Vercel は何を代わりにやってくれていたのか</a> — ここまでで組み立てた部品の数を数えながら、隠されていたものを整理します。</p>
+</section>
+<section id="ch-15">
+<p class="eyebrow">第15章</p>
+<h1>第15章 Netlify / Vercel は何を代わりにやってくれていたのか</h1>
+<blockquote class="lead">
+<p><strong>この章でわかること</strong></p>
+<ul>
+<li>Netlify / Vercel が隠蔽している機能と、AWSでの対応部品を機能軸で対応づけられる</li>
+<li>同じサイトをAWSで組むと部品が何個必要になるかを数えられる</li>
+<li>「自由度は高いが知識が必要」を、責任範囲の違いとして説明できる</li>
+<li>用途に応じてNetlify / Vercel と AWS を使い分ける判断基準を示せる</li>
+</ul>
+<p><strong>前の章とのつながり</strong>: <a href="#ch-13">第13章</a>と<a href="#ch-14">第14章</a>で、2つの構成を最後まで組み立てました。この章では、それを普段使っているプラットフォームと並べて比べます。</p>
+</blockquote>
+<h2>なぜこれが必要なのか</h2>
+<p>ここまで読み進めた方は、途中で一度こう思ったはずです。「Netlifyなら数クリックで終わる話なのに、なぜこんなに部品が必要なのか」。</p>
+<p>その感覚は正しく、そして重要です。Netlify や Vercel が数クリックで済ませてくれていたのは、<strong>やらなくてよかったから</strong>ではなく、<strong>誰かが代わりにやっていたから</strong>です。この章では、その中身をこれまで学んだAWSの部品名で1つずつ言い当てていきます。これができると、障害や制約に出会ったときに「どの層で何が起きているのか」を推測でき、プロジェクトごとの選択にも根拠を持てるようになります。</p>
+<h2>まずはざっくり: 中学生にもわかる説明</h2>
+<p>店を開くときの2つの始め方にたとえると分かりやすくなります。</p>
+<p>Netlify や Vercel は、<strong>すでに建物も受付も倉庫も配送網も整った施設の一区画を借りる</strong>やり方です。契約したその日から、荷物を持ち込むだけで営業を始められます。その代わり、区画の間取りを変えたり、施設の配送のしかたを自分で決めたりすることはできません。</p>
+<p>AWSは、<strong>国の中に自分の土地を借り、区画を切り、正門を建て、門番を雇い、建物や倉庫を建てる</strong>やり方です。何をどこに置くかも、誰を通すかも自分で決められます。その代わり、決めなかったものはそのまま存在しないままになります。門を建てなければ人は入ってこられず、門番を置かなければ誰が入ってよいかも決まりません。</p>
+<p>どちらが優れているという話ではありません。荷物を置いて配るだけなら施設を借りるほうが合理的ですし、奥まった場所に金庫室を構えるような特別な要件があるなら、自分で土地から用意するしかありません。<strong>選ぶ基準は「何が必要か」であって、「どちらが上か」ではありません。</strong></p>
+<h2>身近なたとえ</h2>
+<p>前章までの世界観で言い直すと、こうなります。</p>
+<p>Netlify や Vercel を使うのは、<strong>すでに建物も受付も配送網も整った施設の一区画を借りる</strong>ことです。倉庫も各地の前線倉庫も住所録への登録も、すべて施設の運営会社がやってくれます。利用者は荷物を持ち込むだけです。</p>
+<p>AWSを使うのは、<strong>国の中に自分の土地を借り、区画を切り、正門を建て、門番を雇い、倉庫を建てる</strong>ことです。運営会社の代わりに自分が設計者になります。同じ「荷物を届ける」結果に到達しますが、途中でどれだけの判断を自分でするかが違います。</p>
+<h2>技術的にはこういうこと</h2>
+<p>機能軸で並べると、対応関係は次のようになります。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>機能</th>
+<th>Netlify / Vercel</th>
+<th>AWSでの部品（章）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ソースからのビルド</td>
+<td>Gitに繋げば自動でビルド</td>
+<td>GitHub Actions等のCIで <code>astro build</code> を実行（<a href="#ch-13">第13章</a>）</td>
+</tr>
+<tr>
+<td>成果物の配置先</td>
+<td>publish directory を指定するだけ</td>
+<td>S3バケット（<a href="#ch-11">第11章</a>）</td>
+</tr>
+<tr>
+<td>CDN配信</td>
+<td>Vercel Edge Network / Netlify CDN が標準で有効</td>
+<td>CloudFront（<a href="#ch-12">第12章</a>）</td>
+</tr>
+<tr>
+<td>HTTPS証明書</td>
+<td>ドメインを登録すると自動で発行・更新</td>
+<td>ACM（CloudFront用はus-east-1で発行。<a href="#ch-12">第12章</a>）</td>
+</tr>
+<tr>
+<td>DNS</td>
+<td>ダッシュボードでドメインを追加</td>
+<td>Route 53のホストゾーンとAliasレコード（<a href="#ch-04">第4章</a>）</td>
+</tr>
+<tr>
+<td>キャッシュ管理</td>
+<td>デプロイのたびに自動でパージ</td>
+<td>CloudFrontのTTL設計とInvalidation（<a href="#ch-12">第12章</a>）</td>
+</tr>
+<tr>
+<td>サーバー実行環境</td>
+<td>サーバーレス関数が自動で用意される</td>
+<td>EC2（<a href="#ch-02">第2章</a>）</td>
+</tr>
+<tr>
+<td>負荷分散</td>
+<td>意識しない</td>
+<td>ALBのリスナー・ターゲットグループ・ヘルスチェック（<a href="#ch-09">第9章</a>）</td>
+</tr>
+<tr>
+<td>スケーリング</td>
+<td>自動</td>
+<td>Auto Scaling Group（<a href="#ch-09">第9章</a>）</td>
+</tr>
+<tr>
+<td>データベース</td>
+<td>別サービスに接続文字列で接続</td>
+<td>RDS（<a href="#ch-10">第10章</a>）</td>
+</tr>
+<tr>
+<td>ネットワーク分離</td>
+<td>利用者からは見えない</td>
+<td>VPC / Subnet（<a href="#ch-05">第5章</a>）</td>
+</tr>
+<tr>
+<td>外部との接続経路</td>
+<td>意識しない</td>
+<td>Internet Gateway / Route Table / NAT Gateway（<a href="#ch-06">第6章</a>・<a href="#ch-07">第7章</a>）</td>
+</tr>
+<tr>
+<td>通信の許可設定</td>
+<td>意識しない</td>
+<td>Security Group（<a href="#ch-08">第8章</a>）</td>
+</tr>
+<tr>
+<td>インフラ管理</td>
+<td>運営会社が実施</td>
+<td>自分で設計・構築・監視</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>部品を数えてみる。</strong>
+静的サイトを1本公開する場合、必要な部品は次のとおりです。</p>
+<pre class="figure"><code>   Static site on AWS
+
+   Route 53   (DNS + Alias record)
+   CloudFront (CDN + HTTPS terminate + cache)
+   ACM        (certificate, us-east-1)
+   S3         (bucket, private + OAC)
+   CI         (build and deploy pipeline)
+</code></pre>
+<p>同じことを、Netlify や Vercel では「リポジトリを繋いでビルドコマンドを指定する」1つの操作で終えられます。<strong>5対1</strong>です。サーバーアプリケーションの場合は、ここにさらに部品が積み上がります。</p>
+<pre class="figure"><code>   Server app on AWS (in addition to the above)
+
+   VPC              Subnet (public x2, private x2)
+   Internet Gateway Route Table (public, private)
+   NAT Gateway      Security Group (alb-sg, app-sg, db-sg)
+   ALB              Target Group + Health Check
+   EC2              Auto Scaling Group + Launch Template
+   RDS              DB Subnet Group
+</code></pre>
+<p>数え方にもよりますが、おおよそ<strong>14種類前後</strong>の構成要素を自分で設計・作成し、それらの関係を正しく設定する必要があります。</p>
+<p><strong>この差は何なのか。</strong>
+重要なのは、この差が「AWSが不便だから」生じているのではない点です。上の表の右列は、<strong>Netlify や Vercel の内部でも誰かが同じ設計をしている</strong>ものです。多くのプラットフォームは基盤としてクラウド（AWSを含む）を使っており、利用者が触らずに済んでいるだけで消えてなくなっているわけではありません。差の正体は<strong>責任範囲の境界線がどこに引かれているか</strong>です。</p>
+<ul>
+<li><strong>ネットワークの責任</strong>: プラットフォームでは、どのサーバーがどのネットワークにいて何と通信できるかを利用者が決められません。AWSではVPCのCIDRからSubnetの分割、Route Tableの1行までを自分で決めます。決めなければ通信は成立しません。</li>
+<li><strong>セキュリティの責任</strong>: AWSでは <code>db-sg</code> のインバウンドに何を書くかが、そのままアクセス可能範囲になります。書き忘れれば繋がらず、広く書きすぎれば穴になります。</li>
+<li><strong>インフラ設計の責任</strong>: 可用性（障害が起きてもサービスを継続できる性質）をどこまで確保するかも自分の判断です。ALBを何AZに配置するか、RDSをどう冗長化するかを、誰も代わりに決めてくれません。</li>
+</ul>
+<p>「自由度が高いが知識が必要」とは、この3つの責任を引き受けるかどうかの話だと考えると具体的になります。</p>
+<h2>AWSでの具体例</h2>
+<p>判断のしかたを、要件から逆に引く形で整理します。</p>
+<pre class="figure"><code>   Requirement                        ► Choice
+
+   Static site, small team            ► Netlify / Vercel
+   Preview deploys, fast iteration    ► Netlify / Vercel
+   Private network segmentation       ► AWS (VPC)
+   DB must not face the internet      ► AWS (Private Subnet + RDS)
+   Integrate with existing AWS assets ► AWS
+   Fine-grained cache / origin design ► AWS (CloudFront)
+</code></pre>
+<p><strong>Netlify / Vercel が向いている場面。</strong> コーポレートサイトやドキュメントサイト、ブログのような静的サイト。プレビューデプロイを活かして高速に反復したいプロジェクト。インフラ担当者がおらず、フロントエンドエンジニアだけで運用するチーム。これらでAWSを選ぶと、得られる利益に対して管理コストが見合わないことが多くなります。</p>
+<p><strong>AWSが向いている場面。</strong> データベースを外部から到達不能な位置に置くことが要件の場合。社内システムなど特定のネットワークからのみアクセスさせたい場合。既にAWS上に別システムがあり同じVPC内で連携させたい場合。キャッシュやオリジンの構成を細かく制御したい場合。責任範囲を自分で持てることが、そのまま利点になります。</p>
+<p><strong>両方を組み合わせる選択肢もあります。</strong> フロントエンドはVercel、バックエンドAPIはAWSのALB + EC2、と分けるのは一般的な構成です。二者択一ではありません。</p>
+<h2>フロントエンド開発との関係</h2>
+<p>Netlifyの管理画面にある「Build command」「Publish directory」という2つの入力欄は、<a href="#ch-13">第13章</a>の <code>astro build</code> と <code>aws s3 sync dist/ s3://my-site-bucket</code> に対応しています。「Domain management」でドメインを追加する操作は、Route 53のホストゾーンにAliasレコードを作る操作です。証明書の欄に何も入力しなくてよいのは、ACMに相当する処理が自動化されているからです。</p>
+<p>Vercelでの <code>getServerSideProps</code> や Route Handlers は、<a href="#ch-14">第14章</a>ではPrivate SubnetのEC2上で動くNode.jsプロセスでした。「Functions」のリージョン設定は、EC2をどのリージョンのSubnetに置くかという選択に相当します。</p>
+<p>この対応づけができるようになったこと自体が、この教科書の目的でした。<strong>AWSの学習は、大量のサービス名を覚える作業ではありません。Webサービスを構成する部品が何であり、その部品同士がどういう関係で繋がっているのかを理解する作業です。</strong> Netlify や Vercel を使い続けるとしても、この理解があれば、ビルドが失敗したときもキャッシュが更新されないときもDBに繋がらないときも、「どの層の話なのか」を切り分けられます。</p>
+<h2>よくある勘違い</h2>
+<blockquote class="misconception">
+<p><strong>勘違い</strong>: Netlify や Vercel は簡易的な仕組みで、本格的なサービスはAWSで作るべきだ。
+<strong>実際は</strong>: 用途の違いです。静的サイトや小〜中規模のアプリケーションでは、プラットフォームのほうが運用負荷とコストの両面で合理的な場面が多くあります。</p>
+<p><strong>勘違い</strong>: Netlify や Vercel を使えば、インフラの知識はまったく不要である。
+<strong>実際は</strong>: 隠蔽されているだけで、DNSの伝播、キャッシュの挙動、実行環境のリージョンといった概念は表に出てきます。理解していれば、トラブル時の切り分けが速くなります。</p>
+<p><strong>勘違い</strong>: AWSに移行すれば必ず安くなる。
+<strong>実際は</strong>: 部品ごとの課金であり、たとえばNAT Gatewayは起動している時間とデータ量の両方に課金されます。構成次第でどちらが安いかは変わります。</p>
+<p><strong>勘違い</strong>: NetlifyかAWSか、どちらか一方を選ばなければならない。
+<strong>実際は</strong>: フロントエンドをVercel、バックエンドAPIをAWSに置くといった組み合わせは一般的です。要件ごとに適したものを選べます。</p>
+</blockquote>
+<h2>この章で覚えるべきポイント</h2>
+<ul>
+<li class="task"><input type="checkbox"> Netlify / Vercel が隠蔽しているのは、ビルド・配置・CDN・HTTPS・DNS・キャッシュ・実行環境・スケーリング・ネットワーク・インフラ管理</li>
+<li class="task"><input type="checkbox"> 静的サイト1本をAWSで組むと、Route 53・CloudFront・ACM・S3・CIの5要素が必要になる</li>
+<li class="task"><input type="checkbox"> サーバーアプリではVPC以下の要素が加わり、おおよそ14種類前後まで増える</li>
+<li class="task"><input type="checkbox"> 違いの本質は、ネットワーク・セキュリティ・インフラ設計の責任を誰が持つかという境界線</li>
+<li class="task"><input type="checkbox"> 静的サイトや小規模はNetlify / Vercel、ネットワーク分離や既存AWS資産との統合はAWSが向く</li>
+<li class="task"><input type="checkbox"> AWSはサービス名の暗記ではなく、部品と部品同士の関係を理解する対象である</li>
+</ul>
+<aside class="saa">
+<h3>Solutions Architect Associate ではこう問われる</h3>
+<p>試験でプラットフォームとの比較そのものは問われませんが、この章の考え方は「要件に対して最小限の構成を選ぶ」という設問形式に直結します。静的コンテンツだけの要件でEC2を含む選択肢が並んでいれば、それは運用負荷の高いほうを選ばせる誤答です。逆に「データベースをインターネットから隔離したい」「既存のVPC内リソースと通信させたい」という条件が出れば、VPCを伴う構成が必要になります。<strong>「その要件を満たす最小の部品構成はどれか」</strong>という問いの立て方に慣れておくことが、そのまま得点につながります。</p>
+</aside>
+<hr />
+<p><strong>次の章</strong>: <a href="#ch-16">第16章 頭の中に持っておくAWS全体図</a> — ここまでに登場した全部品の関係を、1枚の図として整理します。</p>
+</section>
+<section id="ch-16">
+<p class="eyebrow">第16章</p>
+<h1>第16章 頭の中に持っておくAWS全体図</h1>
+<blockquote class="lead">
+<p><strong>この章でわかること</strong></p>
+<ul>
+<li>静的サイト構成とサーバーアプリ構成を、1枚の図として頭の中に置ける</li>
+<li>各部品が「VPCの中か外か」「Publicか Privateか」を即答できる</li>
+<li>ブラウザにURLを入力してから画面が出るまでの経路を、2パターンとも言葉で説明できる</li>
+<li>新しい案件で「静的でよいか、サーバーが要るか」を最初に判断できる</li>
+</ul>
+<p><strong>前の章とのつながり</strong>: 第13〜15章で、部品を静的サイト構成とサーバーアプリ構成に組み上げ、Netlify / Vercel との違いも整理しました。この章では、そのすべてを1枚の図にまとめ直します。</p>
+</blockquote>
+<p>ここまで16章分の部品が登場しました。しかし実務で必要なのは、部品の一覧を思い出せることではなく、<strong>1枚の図を白紙に描けること</strong>です。この章は、その1枚を作るための章です。</p>
+<h2>全体図</h2>
+<p>次の図が、本書のゴールです。上段が入口（VPCの外側）、下段がVPCの内部で、上段の右側から下段へ経路が続いています。1枚の図を上下2段に分けて表示しているだけなので、続きものとして読んでください。</p>
+<p><strong>全体図（上段: 入口）</strong></p>
+<pre class="figure"><code>                     User (Browser)
+                           │
+                           ▼
+                        Route 53          (DNS / Alias record)
+                           │
+              ┌────────────┴────────────┐
+              ▼                         ▼
+         CloudFront                    ALB
+     (CDN / HTTPS / Cache)        (Public Subnet)
+              │                         │
+              ▼                         ▼
+             S3                [ continues below ]
+     (dist/ : HTML, CSS, JS)
+</code></pre>
+<p>左が静的サイトの経路（図A）、右がサーバーアプリの経路（図B）です。CloudFront と S3 はVPCの外側にあるサービスで、ALB から下はVPCの中に入ります。</p>
+<p><strong>全体図（下段: VPC内部）</strong></p>
+<pre class="figure"><code>            Internet
+               │
+               ▼
+      ┌─── Internet Gateway ───┐
+      │                        │
+┌─────┴────────── VPC ─────────┴─────┐
+│ 10.0.0.0/16                        │
+│                                    │
+│  ┌─── Public Subnet 10.0.1.0/24 ─┐ │
+│  │   ALB                         │ │
+│  │   NAT Gateway                 │ │
+│  └───────────────────────────────┘ │
+│                 │                  │
+│                 ▼                  │
+│  ┌─── Private Subnet 10.0.2.0/24 ┐ │
+│  │   EC2  (App / Auto Scaling)   │ │
+│  │   RDS  (Database)             │ │
+│  └───────────────────────────────┘ │
+│                                    │
+└────────────────────────────────────┘
+</code></pre>
+<p>Security Group は図に描かれていませんが、ALB・EC2・RDS のそれぞれに付いています。図に現れない理由は、Security Group が「場所」ではなく「リソースに付く許可設定」だからです（第8章）。Route Table も同様で、Public Subnet と Private Subnet のそれぞれに1つずつ関連付けられています。</p>
+<p>なお、この図は説明のための簡略図です。実運用では Public / Private ともに2つ以上のAZにSubnetを作ります。ALB もRDSのDBサブネットグループも、2AZ以上を要求するためです（第9章・第10章）。</p>
+<h2>部品ごとの役割一覧</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>部品</th>
+<th>一言でいうと</th>
+<th>たとえ</th>
+<th>置かれる場所</th>
+<th>学んだ章</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Route 53</td>
+<td>ドメイン名をIPやAWSサービスに変換する</td>
+<td>AWSが運営する住所録</td>
+<td>VPC外（グローバル）</td>
+<td><a href="#ch-04">第4章</a></td>
+</tr>
+<tr>
+<td>CloudFront</td>
+<td>世界中の拠点からコピーを配る</td>
+<td>各地の前線倉庫・コンビニ</td>
+<td>VPC外（グローバル）</td>
+<td><a href="#ch-12">第12章</a></td>
+</tr>
+<tr>
+<td>S3</td>
+<td>ファイルを置く</td>
+<td>巨大な倉庫・ロッカー</td>
+<td>VPC外（リージョン単位）</td>
+<td><a href="#ch-11">第11章</a></td>
+</tr>
+<tr>
+<td>VPC</td>
+<td>自分専用のネットワーク領域</td>
+<td>自分専用に借りた土地・敷地</td>
+<td>リージョン内</td>
+<td><a href="#ch-05">第5章</a></td>
+</tr>
+<tr>
+<td>Subnet</td>
+<td>VPCを用途別に切った区画</td>
+<td>敷地内の区画</td>
+<td>VPC内（1つのAZに属する）</td>
+<td><a href="#ch-05">第5章</a></td>
+</tr>
+<tr>
+<td>Internet Gateway</td>
+<td>VPCとインターネットの境界</td>
+<td>敷地の正門</td>
+<td>VPCにアタッチ</td>
+<td><a href="#ch-06">第6章</a></td>
+</tr>
+<tr>
+<td>Route Table</td>
+<td>宛先ごとの行き先ルール</td>
+<td>カーナビ / 道路標識</td>
+<td>Subnetに関連付け</td>
+<td><a href="#ch-06">第6章</a></td>
+</tr>
+<tr>
+<td>NAT Gateway</td>
+<td>中から外への通信だけ通す</td>
+<td>通用口</td>
+<td>VPC内 / Public Subnet</td>
+<td><a href="#ch-07">第7章</a></td>
+</tr>
+<tr>
+<td>Security Group</td>
+<td>どの通信を通すかの許可設定</td>
+<td>建物の入口に立つ門番</td>
+<td>VPC内 / リソース（ENI）単位</td>
+<td><a href="#ch-08">第8章</a></td>
+</tr>
+<tr>
+<td>ALB</td>
+<td>リクエストを複数台へ振り分ける</td>
+<td>受付・案内係</td>
+<td>VPC内 / Public Subnet（2AZ以上）</td>
+<td><a href="#ch-09">第9章</a></td>
+</tr>
+<tr>
+<td>Auto Scaling</td>
+<td>EC2の台数を自動で増減する</td>
+<td>混雑に応じてスタッフを増減する店長</td>
+<td>VPC内 / EC2の配置先に従う</td>
+<td><a href="#ch-09">第9章</a></td>
+</tr>
+<tr>
+<td>EC2</td>
+<td>プログラムを動かす</td>
+<td>敷地に建てた建物（事務所）</td>
+<td>VPC内 / Private Subnet（ALB導入後）</td>
+<td><a href="#ch-02">第2章</a></td>
+</tr>
+<tr>
+<td>RDS</td>
+<td>データを預かるマネージドDB</td>
+<td>金庫室・書庫</td>
+<td>VPC内 / Private Subnet</td>
+<td><a href="#ch-10">第10章</a></td>
+</tr>
+</tbody>
+</table></div>
+<p>この表で押さえてほしいのは、<strong>VPCの中にある部品と外にある部品がはっきり分かれている</strong>という点です。Route 53・CloudFront・S3 はVPCに属しません。だから静的サイト構成では、VPCもSubnetもRoute Tableも一切登場しないのです。</p>
+<h2>データの旅</h2>
+<h3>旅1: 静的サイトの場合</h3>
+<p>ブラウザに <code>https://example.com</code> と入力してから画面が出るまでを、順に追います。</p>
+<ol>
+<li>ブラウザが <code>example.com</code> のIPアドレスを知るために、DNSへ問い合わせます。手元にキャッシュがあればここで終わり、なければルートサーバー → TLDサーバー → 権威DNSサーバーの順にたどります（第3章）。</li>
+<li><code>example.com</code> の権威DNSサーバーはRoute 53です。ホストゾーンに登録されたAレコードのAliasが、CloudFrontを指し示しています（第4章）。</li>
+<li>ブラウザは、返ってきたIPアドレスのポート443へHTTPSで接続します。接続先は、ユーザーに地理的に近いCloudFrontのエッジロケーションです（第12章）。</li>
+<li>CloudFrontがHTTPSを終端します。使われる証明書はACMがus-east-1で発行したものです（第12章）。</li>
+<li>エッジロケーションに目的のファイルのコピーがあれば（キャッシュヒット）、その場で返します。旅はここで終わりです。</li>
+<li>コピーがなければ（キャッシュミス）、CloudFrontはオリジンであるS3へ取りに行きます。S3バケットは非公開で、OACによって署名されたCloudFrontのリクエストだけを受け付けます（第11章・第12章）。</li>
+<li>S3が <code>index.html</code> を返します。CloudFrontはそれをTTLの期間だけエッジロケーションに保存し、同時にブラウザへ返します。</li>
+<li>ブラウザがHTMLを解析し、CSS・JS・画像を同じ経路で取得して、画面が表示されます。2回目以降は多くがキャッシュヒットになります。</li>
+</ol>
+<p><strong>EC2もVPCもSubnetも1つも登場していません。</strong> これが「静的サイトにサーバーは要らない」ということの意味です。</p>
+<h3>旅2: サーバーアプリの場合</h3>
+<p>同じ <code>https://example.com</code> でも、ログインが必要でデータベースを参照するアプリケーションの場合はこうなります。</p>
+<ol>
+<li>ブラウザがDNSへ問い合わせます。ここまでは旅1と同じです。</li>
+<li>Route 53のAレコードのAliasが、今度はALBを指しています（第4章・第9章）。</li>
+<li>ブラウザはALBへHTTPSで接続します。ALBはPublic Subnetに置かれ、2つ以上のAZにまたがっています。ALB自身がインターネットから到達可能なのは、そのSubnetのRoute Tableに <code>0.0.0.0/0 → igw-xxxx</code> があるからです（第6章）。</li>
+<li>ALBのSecurity Group（門番）が、インターネットからの443番を許可しているかを確認します。許可されていれば通ります（第8章）。</li>
+<li>ALBはリスナーで受け取ったリクエストを、ターゲットグループに登録されているEC2のうち、ヘルスチェックに合格しているものへ振り分けます（第9章）。</li>
+<li>EC2はPrivate Subnetにあります。EC2のSecurity Groupは「ALBのSecurity Groupからの通信のみ許可」に設定されているため、インターネットから直接叩かれることはありません（第8章・第9章）。</li>
+<li>EC2上のアプリケーションがリクエストを処理し、必要なデータをRDSに問い合わせます。RDSも同じPrivate Subnetにあり、そのSecurity Groupは「EC2のSecurity Groupからの3306番のみ許可」です（第10章）。</li>
+<li>RDSが結果を返し、EC2がHTMLやJSONを組み立ててALBへ返し、ALBがブラウザへ返します。Security Groupはステートフルなので、この戻りの通信に追加の許可設定は不要です（第8章）。</li>
+<li>アクセスが増えてCPU使用率が上がると、Auto Scaling GroupがEC2を追加で起動します。新しいEC2は自動的にターゲットグループに登録され、ヘルスチェックを通過した時点から振り分け対象に加わります（第9章）。</li>
+<li>なお、このEC2がOSのアップデートや外部APIの呼び出しのために外へ出るときは、Private SubnetのRoute Tableに従ってNAT Gatewayを経由し、そこからInternet Gatewayを通って外に出ます（第7章）。</li>
+</ol>
+<p>旅1と旅2で共通しているのは、最初の2ステップ（DNSとRoute 53）だけです。<strong>3ステップ目から先が完全に別の経路になる</strong>という点が、この2つの構成の本質的な違いです。</p>
+<h2>設計時の判断フロー</h2>
+<p>新しい案件で最初に決めるべきなのは、この分岐です。</p>
+<pre class="figure"><code>        New project
+             │
+             ▼
+   Does a server need to compute
+   per request ?
+   (login / DB / API / SSR)
+             │
+      ┌──────┴──────┐
+      ▼             ▼
+     No            Yes
+      │             │
+      ▼             ▼
+  Static site   Server app
+   (Figure A)    (Figure B)
+      │             │
+      ▼             ▼
+  Route 53      Route 53
+  CloudFront    ALB (Public Subnet)
+  S3 (OAC)      EC2 (Private Subnet)
+                RDS (Private Subnet)
+                + VPC / Subnet / IGW
+                + Route Table / NAT GW
+                + Security Group
+</code></pre>
+<p>判断の基準は「サーバーで計算が必要か」の一点です。ログイン処理、データベースの読み書き、リクエストごとに内容が変わるページの生成（SSR）、外部APIを秘密鍵付きで叩く処理。これらが1つでもあれば右側です。ブログ、コーポレートサイト、ドキュメント、ランディングページのように、ビルド時に出力が確定するものは左側です。</p>
+<p>左右で必要な部品の数がまったく違うことに注目してください。左は3つ、右はネットワークまで含めると10近くあります。この差が、そのままNetlify / Vercel を使うかAWSを自分で組むかの判断材料にもなります（第15章）。</p>
+<p>なお、この分岐は「どちらか一方」とは限りません。実際の案件では、静的なページはCloudFront + S3で配信し、APIだけをALB + EC2で受ける、という組み合わせがよく使われます。その場合もRoute 53のホストゾーンで、<code>example.com</code> はCloudFrontへ、<code>api.example.com</code> はALBへ、とレコードごとに振り分けるだけです（第4章）。<strong>部品の組み合わせ方が変わるだけで、部品そのものは変わりません。</strong></p>
+<h2>この章で覚えるべきポイント</h2>
+<ul>
+<li class="task"><input type="checkbox"> 全体図を白紙に描ける。上段（User / Route 53 / CloudFront / S3・ALB）と下段（VPC内部）に分けて描けばよい</li>
+<li class="task"><input type="checkbox"> Route 53・CloudFront・S3 はVPCの外、ALB・EC2・RDS・NAT Gateway はVPCの中にあると即答できる</li>
+<li class="task"><input type="checkbox"> Public Subnet に置くのはALBとNAT Gateway、Private Subnet に置くのはEC2とRDS、と即答できる</li>
+<li class="task"><input type="checkbox"> 静的サイトの旅とサーバーアプリの旅を、それぞれ番号順に説明できる</li>
+<li class="task"><input type="checkbox"> 「サーバーで計算が必要か」を起点に、構成を選べる</li>
+<li class="task"><input type="checkbox"> Security Group と Route Table は図に現れない部品だが、通信の成立には必須であると説明できる</li>
+</ul>
+<aside class="saa">
+<h3>Solutions Architect Associate ではこう問われる</h3>
+<p>試験では、この章のような全体図が問題文の前提として与えられ、「この構成に何が足りないか」「どこを変えれば要件を満たすか」を答える形が中心になります。個々のサービスの定義を問う設問より、<strong>構成図を読んで欠けている部品を特定する</strong>設問のほうが多いと考えてください。本章の一覧表にある「VPCの中か外か」「PublicかPrivateか」は、その判断の最短ルートになります。特に「RDSがPublic Subnetにある」「NAT GatewayがPrivate Subnetにある」「ALBが1AZしかない」といった構成は、それ自体が誤りの選択肢として頻繁に登場します。</p>
+</aside>
+<hr />
+<p><strong>次の章</strong>: <a href="#ch-17">第17章 次に学ぶことのロードマップ</a> — この全体図に、まだ描かれていない部品を足していく順番を示します。</p>
+</section>
+<section id="ch-17">
+<p class="eyebrow">第17章</p>
+<h1>第17章 次に学ぶことのロードマップ</h1>
+<blockquote class="lead">
+<p><strong>この章でわかること</strong></p>
+<ul>
+<li>本書の次に学ぶべき項目を、理解が積み上がる順番で把握できる</li>
+<li>各項目が本書のどの章の続きにあたるかを説明できる</li>
+<li>それぞれを学ぶと何がわかるようになるかを、事前に把握できる</li>
+</ul>
+<p><strong>前の章とのつながり</strong>: 第16章で全体図を1枚にまとめました。この章では、その図にまだ描かれていない部品を、どの順番で足していくかを示します。</p>
+</blockquote>
+<p>本書で扱った部品だけでも、静的サイトとサーバーアプリの構成は組めます。しかし実務で運用するには、まだ足りないものがあります。それらを片端から学ぼうとすると、前提知識が足りずに何度も戻ることになります。ここでは、<strong>前の項目が次の項目の土台になる順番</strong>を示します。</p>
+<h2>ロードマップ</h2>
+<pre class="figure"><code>   [ End of this book ]
+                │
+                ▼
+   1. IAM                       (all operations start here)
+                │
+                ▼
+   2. Availability Zone / Multi-AZ   (availability)
+                │
+                ▼
+   3. ACM                       (certificates for HTTPS)
+                │
+                ▼
+   4. CloudWatch                (see what is running)
+                │
+                ▼
+   5. AWS Pricing               (cost as a design input)
+                │
+                ▼
+   6. Lambda / API Gateway      (no EC2 option)
+                │
+                ▼
+   7. ECS / Fargate             (containers)
+                │
+                ▼
+   8. Secrets Manager           (credentials)
+                │
+                ▼
+   9. Infrastructure as Code
+        │
+        ├─ CloudFormation       (AWS native)
+        ├─ CDK                  (IaC in TypeScript)
+        └─ Terraform            (multi-cloud)
+</code></pre>
+<p>前半（1〜5）は「今ある構成を、正しく安全に運用するための知識」です。後半（6〜9）は「構成そのものを別の形に置き換える選択肢」です。この順番を守ると、後半で新しいサービスが出てきても、前半で得た判断軸（可用性・監視・コスト）でそれを評価できるようになります。</p>
+<h2>1. IAM</h2>
+<p><strong>なぜこの順番か</strong>: IAM（Identity and Access Management）は、AWSにおける「誰が何をしてよいか」を定義する仕組みです。EC2を起動する、S3にファイルを置く、RDSに接続する。本書で行ったすべての操作は、実はIAMの権限があって初めて成立しています。ここを飛ばすと、この先どのサービスを学んでも「なぜか権限エラーで動かない」という壁に当たり続けます。</p>
+<p><strong>何がわかるようになるか</strong>: ユーザー・グループ・ロール・ポリシーの違いと、必要最小限の権限だけを与える考え方がわかります。特に<strong>IAMロール</strong>は重要で、EC2がS3にアクセスするときにアクセスキーをサーバーに置かずに済む仕組みです。第11章でS3にアップロードした <code>aws s3 sync</code> が、なぜ認証情報を必要としたのかもここで腑に落ちます。</p>
+<p><strong>SAAではどう関わるか</strong>: 「EC2からS3にアクセスさせたい」という要件でIAMロールを選ばせる設問が定番です。</p>
+<h2>2. Availability Zone / Multi-AZ</h2>
+<p><strong>本書のどの章の続きか</strong>: 第5章（Subnetは1つのAZに属する）、第9章（ALBは2AZ以上必要）、第10章（DBサブネットグループは2AZ以上必要）で名前だけ触れた内容の完成形です。</p>
+<p><strong>なぜこの順番か</strong>: 本書では「2AZ以上必要」という事実だけを述べ、理由を先送りしてきました。AZ（Availability Zone）とは、1つのリージョンの中にある、電源・空調・ネットワークが独立した複数のデータセンター群のことです。これを理解して初めて、なぜ複数AZが可用性の前提なのかが説明できるようになります。</p>
+<p><strong>何がわかるようになるか</strong>: リージョンとAZの関係、AZ障害という事象、そしてRDSの<strong>Multi-AZ</strong>（別AZに待機系を自動で用意し、障害時に自動で切り替える機能）が何をしてくれるのかがわかります。Multi-AZは可用性を上げる機能であり、読み取り性能を上げるRead Replicaとは目的が違う、という区別もここで身に付きます。</p>
+<p><strong>SAAではどう関わるか</strong>: 可用性を問う設問のほぼすべてがAZの理解を前提にしています。最頻出領域です。</p>
+<h2>3. ACM</h2>
+<p><strong>本書のどの章の続きか</strong>: 第12章で「CloudFront用の証明書はus-east-1で発行する」とだけ書いた、その証明書そのものの話です。</p>
+<p><strong>なぜこの順番か</strong>: HTTPSは本書ですでに登場しており、証明書だけが宙に浮いた状態になっています。ここを埋めておくと、独自ドメインでHTTPSを有効にする作業を最後まで自力で完結できるようになります。</p>
+<p><strong>何がわかるようになるか</strong>: ACM（AWS Certificate Manager）で証明書を無料で発行し、自動更新させる流れがわかります。DNS検証（Route 53にレコードを1つ追加してドメインの所有を証明する方法）と、証明書を発行するリージョンの制約（CloudFrontならus-east-1、ALBならALBと同じリージョン）が理解できます。</p>
+<p><strong>SAAではどう関わるか</strong>: 「証明書をどのリージョンで発行するか」を問う設問が典型です。</p>
+<h2>4. CloudWatch</h2>
+<p><strong>なぜこの順番か</strong>: ここまでで「構成を作る」ことはできますが、「作ったものが今どうなっているか」を見る手段がありません。次に進む前に、動いているものを観測できる状態を作っておくべきです。第9章のAuto Scalingが「CPU使用率に応じて」台数を増やすと説明しましたが、そのCPU使用率を測っているのがCloudWatchです。</p>
+<p><strong>何がわかるようになるか</strong>: メトリクス（数値の時系列データ）、ログ、アラーム（閾値を超えたら通知する仕組み）の3つの役割がわかります。Auto Scalingのスケーリングポリシーが何を見て発動しているのか、EC2上のアプリケーションのエラーログをどこに集めるのかが、具体的な設定として理解できるようになります。</p>
+<p><strong>SAAではどう関わるか</strong>: Auto Scalingや通知の設問で、CloudWatchアラームを起点とする構成が正解になります。</p>
+<h2>5. AWS料金体系</h2>
+<p><strong>なぜこの順番か</strong>: ここから先は「同じ目的を達成する複数の方法」を比較する話になります。その比較にはコストという軸が不可欠です。第7章でNAT Gatewayに時間課金とデータ処理課金があると触れましたが、あのような「置いておくだけでかかる費用」の全体像を先に押さえておくと、6以降の選択肢を正しく評価できます。</p>
+<p><strong>何がわかるようになるか</strong>: 課金の主な軸（起動時間、データ転送量、リクエスト数、確保しているだけでかかる料金）と、EC2の購入オプション（オンデマンド、リザーブドインスタンス、Savings Plans、スポットインスタンス）の使い分けがわかります。「なぜ静的サイトはCloudFront + S3のほうが安いのか」を数字の構造として説明できるようになります。</p>
+<p><strong>SAAではどう関わるか</strong>: 「最もコスト効率の高い構成はどれか」という問い方が非常に多く、可用性と並ぶ2大評価軸です。</p>
+<h2>6. Lambda / API Gateway</h2>
+<p><strong>本書のどの章の続きか</strong>: 第2章で「EC2はプログラムを動かす場所」と定義しました。その「動かす場所」の、まったく別の選択肢です。</p>
+<p><strong>なぜこの順番か</strong>: EC2という基準を持っている今だからこそ、Lambdaの「サーバーを持たない」という特徴の意味がわかります。逆順で学ぶと、何が省略されているのかが見えません。</p>
+<p><strong>何がわかるようになるか</strong>: Lambdaは、コードを登録しておくとリクエストが来たときだけ実行される仕組みです。EC2のように常時起動している必要がないため、アクセスがない時間帯の費用が発生しません。API Gatewayは、そのLambdaをHTTPのエンドポイントとして公開する部品で、サーバーアプリ構成におけるALBの位置に相当します。この2つを学ぶと、<strong>VercelのAPI RoutesやServer Actionsが裏で何をしているのか</strong>が、AWSの部品として説明できるようになります。</p>
+<p><strong>SAAではどう関わるか</strong>: 「常時稼働が不要な処理」「イベント駆動の処理」ではLambdaが正解になりやすい形です。</p>
+<h2>7. ECS / Fargate</h2>
+<p><strong>本書のどの章の続きか</strong>: 第2章のEC2と、6のLambdaの中間にあたる選択肢です。</p>
+<p><strong>なぜこの順番か</strong>: 両端（EC2とLambda）を知ってから中間を学ぶほうが、位置づけを理解しやすいためです。</p>
+<p><strong>何がわかるようになるか</strong>: コンテナ（アプリケーションと実行環境をひとまとめにした単位）をAWSで動かす方法がわかります。ECS（Elastic Container Service）がコンテナの起動・停止・台数を管理する仕組みで、Fargateはそのコンテナを動かすサーバーをAWS側が用意してくれる方式です。Fargateを使うと、EC2インスタンスのOS管理から解放されつつ、Lambdaのような実行時間の制約は受けずに済みます。第9章のAuto Scalingが「EC2の台数」だったのに対し、ECSでは「コンテナの数」を同じ発想で管理することになります。</p>
+<p><strong>SAAではどう関わるか</strong>: 「コンテナを動かしたいがサーバー管理はしたくない」ならFargateが正解になります。</p>
+<h2>8. Secrets Manager</h2>
+<p><strong>本書のどの章の続きか</strong>: 第10章でRDSに接続する際、エンドポイントとユーザー名・パスワードをEC2側のアプリケーションに渡す、と書きました。その「渡し方」の正解にあたる部分です。</p>
+<p><strong>なぜこの順番か</strong>: IAM（1）を理解していないと、Secrets Managerの「誰がこの秘密を読めるか」という核心部分が理解できません。だからIAMの後に置いています。</p>
+<p><strong>何がわかるようになるか</strong>: データベースのパスワードやAPIキーを、コードや環境変数に直接書かずに管理する方法がわかります。Secrets Managerはこれらを暗号化して保管し、IAMロールを持つリソースだけが実行時に取り出せるようにする仕組みです。パスワードの自動ローテーション（定期的な自動変更）にも対応しています。VercelのEnvironment Variablesに相当するものを、AWSではどう実現するかという話でもあります。</p>
+<p><strong>SAAではどう関わるか</strong>: 「認証情報をコードに埋め込まない」という要件で、Secrets ManagerまたはParameter Storeが正解になります。</p>
+<h2>9. Infrastructure as Code の考え方 → CloudFormation → CDK → Terraform</h2>
+<p><strong>本書のどの章の続きか</strong>: 第5章から第9章まで、VPCを作り、Subnetを2つ作り、Route Tableを作って関連付け、Security Groupを設定しました。あれを<strong>すべてコードとして書く</strong>、というのがこの項目です。</p>
+<p><strong>なぜこの順番か</strong>: 最後に置いているのは、書く対象を知らないとコードも書けないからです。手作業で一度組んだ経験があって初めて、コードにする意味（同じ構成を再現できる、変更履歴が残る、レビューできる、環境を丸ごと作り直せる）が実感を伴って理解できます。</p>
+<p><strong>何がわかるようになるか</strong>: まず<strong>Infrastructure as Code（IaC）の考え方</strong>そのものを押さえます。インフラの構成をコードとして記述し、そのコードを実行することで実際のリソースを作る、という発想です。フロントエンドで <code>package.json</code> があれば同じ依存関係を再現できるのと同じ考え方を、インフラに適用したものだと考えてください。</p>
+<p>次に具体的なツールを、この順で見ていきます。</p>
+<ul>
+<li><strong>CloudFormation</strong>: AWSが公式に提供するIaCサービスです。YAMLまたはJSONでリソースを記述します。まずこれを見ると、IaCが「宣言的に書いた状態にAWSを合わせる」仕組みであることがわかります。</li>
+<li><strong>CDK（Cloud Development Kit）</strong>: CloudFormationのテンプレートを、TypeScriptなどのプログラミング言語で生成できるツールです。フロントエンドエンジニアにとっては最も入りやすい選択肢で、型補完を効かせながらVPCやALBを定義できます。CloudFormationを先に見ておくと、CDKが最終的に何を出力しているのかがわかるため、エラーの原因を追えるようになります。</li>
+<li><strong>Terraform</strong>: HashiCorp社が提供する、AWS以外のクラウドサービスにも対応したIaCツールです。複数のクラウドやSaaSをまとめて管理したい場合の選択肢になります。AWS専用のCloudFormation / CDKとの違いを理解した上で選べるように、最後に置いています。</li>
+</ul>
+<p><strong>SAAではどう関わるか</strong>: 「同じ構成を複数の環境に再現したい」という要件でCloudFormationが正解になります（TerraformやCDKは試験の主対象ではありませんが、実務では選択肢に入ります）。</p>
+<h2>最後に</h2>
+<p>ここまで読み進めた方は、AWSのサービス名を17章分覚えたわけではありません。覚えたのは、<strong>Webサービスがどんな部品でできていて、その部品同士がどうつながっているか</strong>です。ドメイン名を住所に変換する部品があり、その先に配信を速くする部品があり、あるいはリクエストを振り分ける部品があり、その奥にプログラムを動かす部品とデータを預かる部品がある。それらを囲む土地があり、外とつなぐ門があり、道を示す標識があり、入口に門番が立っている。この章で挙げた14項目も、そしてこの先AWSに追加される新しいサービスも、すべてこの図のどこかに置かれる部品です。新しいサービス名を見たときに「これは全体図のどこに入るのか」「どの部品の代わりになるのか」と問える限り、学ぶべきことはもう暗記ではありません。AWSとは、大量のサービス名を覚えるものではなく、Webサービスを構成する部品と、その部品同士の関係を理解するものです。</p>
+</section>
+<section id="glossary">
+<p class="eyebrow">付録</p>
+<h1>APPENDIX 用語集</h1>
+<p>本書に登場する用語と、その意味、そして<strong>その用語が最初に説明されている章</strong>へのリンクをまとめています。読んでいる途中で用語の意味を忘れたときは、この表から初出章に戻って確認してください。</p>
+<p>「初出章」は、その用語が本文中で初めて意味を説明されている章です。第0章の目次やたとえ話の統一台帳での言及は、初出には数えていません。</p>
+<h2>アルファベット</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>用語</th>
+<th>意味</th>
+<th>初出章</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ACM (AWS Certificate Manager)</td>
+<td>HTTPS用の証明書を発行・自動更新するAWSのサービス。CloudFrontで使う証明書はus-east-1で発行する</td>
+<td><a href="#ch-12">第12章</a></td>
+</tr>
+<tr>
+<td>ALB (Application Load Balancer)</td>
+<td>HTTP/HTTPSのリクエストを複数のEC2へ振り分けるロードバランサー</td>
+<td><a href="#ch-09">第9章</a></td>
+</tr>
+<tr>
+<td>Alias レコード</td>
+<td>Route 53独自のレコード。Aレコードの形でCloudFront・ALB・S3を直接指せる</td>
+<td><a href="#ch-04">第4章</a></td>
+</tr>
+<tr>
+<td>AMI (Amazon Machine Image)</td>
+<td>OSやプリインストールされたソフトの組み合わせを定義したEC2起動用テンプレート</td>
+<td><a href="#ch-02">第2章</a></td>
+</tr>
+<tr>
+<td>Auto Scaling Group (ASG)</td>
+<td>条件に応じてEC2の台数を自動で増減させる仕組み。ALBのターゲットグループへ自動登録される</td>
+<td><a href="#ch-09">第9章</a></td>
+</tr>
+<tr>
+<td>AWS (Amazon Web Services)</td>
+<td>Amazonが提供するクラウドコンピューティングサービス群の総称</td>
+<td><a href="#ch-01">第1章</a></td>
+</tr>
+<tr>
+<td>A レコード</td>
+<td>ドメイン名を直接IPアドレスに対応づけるDNSレコード</td>
+<td><a href="#ch-04">第4章</a></td>
+</tr>
+<tr>
+<td>CDN (Content Delivery Network)</td>
+<td>世界各地の拠点にコピーを置き、利用者に近い場所から配信して速度を上げる仕組み</td>
+<td><a href="#ch-12">第12章</a></td>
+</tr>
+<tr>
+<td>CIDR (Classless Inter-Domain Routing)</td>
+<td><code>10.0.0.0/16</code> のように、ネットワークで使うIPアドレスの範囲を1行で表す書き方</td>
+<td><a href="#ch-05">第5章</a></td>
+</tr>
+<tr>
+<td>CloudFront</td>
+<td>AWSのCDN。エッジロケーションにキャッシュを持ち、HTTPSの終端も行う</td>
+<td><a href="#ch-12">第12章</a></td>
+</tr>
+<tr>
+<td>CNAME レコード</td>
+<td>あるドメイン名を、別のドメイン名の別名として登録するDNSレコード</td>
+<td><a href="#ch-04">第4章</a></td>
+</tr>
+<tr>
+<td>DBサブネットグループ</td>
+<td>RDSを配置してよいSubnetの集合を定義する設定。2つ以上のAZにまたがる必要がある</td>
+<td><a href="#ch-10">第10章</a></td>
+</tr>
+<tr>
+<td>DNS (Domain Name System)</td>
+<td>ドメイン名をIPアドレスに変換する仕組み</td>
+<td><a href="#ch-03">第3章</a></td>
+</tr>
+<tr>
+<td>EC2 (Elastic Compute Cloud)</td>
+<td>AWS上で借りられる仮想サーバー。プログラムを「動かす」場所</td>
+<td><a href="#ch-02">第2章</a></td>
+</tr>
+<tr>
+<td>Elastic IP (EIP)</td>
+<td>明示的に解放するまで変わらない固定のパブリックIPアドレス</td>
+<td><a href="#ch-06">第6章</a></td>
+</tr>
+<tr>
+<td>ENI (Elastic Network Interface)</td>
+<td>AWSリソースが持つ仮想的なネットワークカード。Security Groupはこの単位で適用される</td>
+<td><a href="#ch-08">第8章</a></td>
+</tr>
+<tr>
+<td>HTTPS の終端</td>
+<td>暗号化された通信を復号し、そこから先は別の経路で扱うこと。本書ではCloudFrontが担う</td>
+<td><a href="#ch-12">第12章</a></td>
+</tr>
+<tr>
+<td>Internet Gateway (IGW)</td>
+<td>VPCとインターネットの間で通信を成立させるコンポーネント。VPCに1つアタッチする</td>
+<td><a href="#ch-06">第6章</a></td>
+</tr>
+<tr>
+<td>Invalidation（キャッシュの無効化）</td>
+<td>CloudFrontのエッジロケーションに残った古いキャッシュを明示的に破棄する操作</td>
+<td><a href="#ch-12">第12章</a></td>
+</tr>
+<tr>
+<td>IPアドレス</td>
+<td>インターネットに接続された機器を識別する番号。通信の最終的な宛先</td>
+<td><a href="#ch-03">第3章</a></td>
+</tr>
+<tr>
+<td>Multi-AZ</td>
+<td>RDSで、別のAZに待機系を用意し障害時に切り替える機能。有効化が必要</td>
+<td><a href="#ch-10">第10章</a></td>
+</tr>
+<tr>
+<td>NAT (Network Address Translation)</td>
+<td>パケットの送信元IPアドレスを書き換える仕組み</td>
+<td><a href="#ch-07">第7章</a></td>
+</tr>
+<tr>
+<td>NAT Gateway</td>
+<td>Private Subnetからの外向き通信を中継し、戻りだけを返すマネージドサービス。Public Subnetに置く</td>
+<td><a href="#ch-07">第7章</a></td>
+</tr>
+<tr>
+<td>OAC (Origin Access Control)</td>
+<td>S3バケットを非公開のまま、CloudFrontだけに読み取りを許可する推奨の接続方式</td>
+<td><a href="#ch-12">第12章</a></td>
+</tr>
+<tr>
+<td>RDS (Relational Database Service)</td>
+<td>MySQLやPostgreSQLを運用するマネージドなデータベースサービス</td>
+<td><a href="#ch-10">第10章</a></td>
+</tr>
+<tr>
+<td>Route 53</td>
+<td>AWSが提供するDNSサービス</td>
+<td><a href="#ch-04">第4章</a></td>
+</tr>
+<tr>
+<td>Route Table</td>
+<td>「宛先IPアドレスの範囲」と「その宛先へ渡す先」の対応表。Subnetに関連付けて使う</td>
+<td><a href="#ch-06">第6章</a></td>
+</tr>
+<tr>
+<td>S3 (Simple Storage Service)</td>
+<td>AWSのオブジェクトストレージ。ファイルを「置く」場所</td>
+<td><a href="#ch-11">第11章</a></td>
+</tr>
+<tr>
+<td>Security Group</td>
+<td>リソース（ENI）単位で適用される仮想ファイアウォール。ステートフルで許可ルールのみ</td>
+<td><a href="#ch-08">第8章</a></td>
+</tr>
+<tr>
+<td>SSG（静的サイトジェネレーター）</td>
+<td>ビルド時にHTML等を生成し、リクエスト時の計算を不要にする方式。Astroなど</td>
+<td><a href="#ch-11">第11章</a></td>
+</tr>
+<tr>
+<td>SSH (Secure Shell)</td>
+<td>サーバーに安全にリモート接続するための通信方式。標準ポートは22番</td>
+<td><a href="#ch-02">第2章</a></td>
+</tr>
+<tr>
+<td>Subnet</td>
+<td>VPCを用途別に切り分けた区画。必ず1つのAZの中に作られる</td>
+<td><a href="#ch-05">第5章</a></td>
+</tr>
+<tr>
+<td>TTL (Time To Live)</td>
+<td>キャッシュを保持しておく有効期限。DNSの変更がすぐ反映されない原因になる</td>
+<td><a href="#ch-03">第3章</a></td>
+</tr>
+<tr>
+<td>VPC (Virtual Private Cloud)</td>
+<td>AWSアカウント内に作る、論理的に隔離された自分専用の仮想ネットワーク</td>
+<td><a href="#ch-05">第5章</a></td>
+</tr>
+<tr>
+<td>Zone Apex</td>
+<td><code>www</code> などのサブドメインが付かないドメインの頂点（<code>example.com</code> 自体）。CNAMEを設定できない</td>
+<td><a href="#ch-04">第4章</a></td>
+</tr>
+</tbody>
+</table></div>
+<h2>五十音順</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>用語</th>
+<th>意味</th>
+<th>初出章</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>アウトバウンド</td>
+<td>リソースから外へ出ていく方向の通信</td>
+<td><a href="#ch-08">第8章</a></td>
+</tr>
+<tr>
+<td>アベイラビリティゾーン (AZ)</td>
+<td>リージョン内で独立して構成されたデータセンター群の単位。Subnetは1つのAZに属する</td>
+<td><a href="#ch-05">第5章</a></td>
+</tr>
+<tr>
+<td>インスタンスタイプ</td>
+<td>EC2のCPU・メモリ性能の区分。<code>t3.micro</code> など</td>
+<td><a href="#ch-02">第2章</a></td>
+</tr>
+<tr>
+<td>インバウンド</td>
+<td>外からリソースへ入ってくる方向の通信</td>
+<td><a href="#ch-08">第8章</a></td>
+</tr>
+<tr>
+<td>エッジロケーション</td>
+<td>CloudFrontがコンテンツのコピーを保持する世界各地の拠点</td>
+<td><a href="#ch-12">第12章</a></td>
+</tr>
+<tr>
+<td>オブジェクト</td>
+<td>S3のバケットに保存される実体（ファイル本体と付随情報）</td>
+<td><a href="#ch-11">第11章</a></td>
+</tr>
+<tr>
+<td>オブジェクトストレージ</td>
+<td>ファイルをフォルダ階層ではなく「オブジェクト」としてフラットに保管する仕組み</td>
+<td><a href="#ch-11">第11章</a></td>
+</tr>
+<tr>
+<td>オリジン</td>
+<td>CDNが配信する元データを持っている場所。本書ではS3バケット</td>
+<td><a href="#ch-12">第12章</a></td>
+</tr>
+<tr>
+<td>可用性 (Availability)</td>
+<td>システムが停止せずに使える状態をどれだけ維持できるか</td>
+<td><a href="#ch-09">第9章</a></td>
+</tr>
+<tr>
+<td>キー (key)</td>
+<td>S3のオブジェクトを一意に識別する名前。<code>images/logo.png</code> など</td>
+<td><a href="#ch-11">第11章</a></td>
+</tr>
+<tr>
+<td>キャッシュ</td>
+<td>一度取得したデータを一時的に保存し、次回以降そのコピーを使い回す仕組み</td>
+<td><a href="#ch-03">第3章</a></td>
+</tr>
+<tr>
+<td>キャッシュヒット / キャッシュミス</td>
+<td>エッジロケーションのコピーで応答できた場合がヒット、オリジンまで取りに行く場合がミス</td>
+<td><a href="#ch-12">第12章</a></td>
+</tr>
+<tr>
+<td>権威DNSサーバー</td>
+<td>あるドメインについて「正しい答え」を持つ、そのドメインの管理担当サーバー</td>
+<td><a href="#ch-03">第3章</a></td>
+</tr>
+<tr>
+<td>サブネットマスク</td>
+<td>CIDRの <code>/16</code> <code>/24</code> の部分。数字が大きいほどアドレス範囲は狭くなる</td>
+<td><a href="#ch-05">第5章</a></td>
+</tr>
+<tr>
+<td>冗長化 (Redundancy)</td>
+<td>同じ役割の構成要素を複数用意し、一部が壊れても全体が止まらないようにすること</td>
+<td><a href="#ch-09">第9章</a></td>
+</tr>
+<tr>
+<td>垂直スケーリング</td>
+<td>1台のスペックを上げて処理能力を上げる方式</td>
+<td><a href="#ch-09">第9章</a></td>
+</tr>
+<tr>
+<td>水平スケーリング</td>
+<td>台数を増やして処理能力を上げる方式。Auto Scalingはこちら</td>
+<td><a href="#ch-09">第9章</a></td>
+</tr>
+<tr>
+<td>スケーラビリティ (Scalability)</td>
+<td>負荷の増減に応じて処理能力を調整できる度合い</td>
+<td><a href="#ch-09">第9章</a></td>
+</tr>
+<tr>
+<td>ステートフル</td>
+<td>通信の状態を記憶して判断する性質。許可した通信の戻りは自動で通る</td>
+<td><a href="#ch-08">第8章</a></td>
+</tr>
+<tr>
+<td>静的ウェブサイトホスティング</td>
+<td>S3バケットの中身を直接Webサイトとして公開する機能。本書では使わない旧来方式</td>
+<td><a href="#ch-11">第11章</a></td>
+</tr>
+<tr>
+<td>ターゲットグループ</td>
+<td>ALBの振り分け先となるEC2インスタンスの集まり</td>
+<td><a href="#ch-09">第9章</a></td>
+</tr>
+<tr>
+<td>単一障害点</td>
+<td>そこが停止すると全体が止まってしまう箇所</td>
+<td><a href="#ch-09">第9章</a></td>
+</tr>
+<tr>
+<td>デフォルトルート</td>
+<td>Route Tableの <code>0.0.0.0/0</code>（すべての宛先）の行</td>
+<td><a href="#ch-06">第6章</a></td>
+</tr>
+<tr>
+<td>ドメイン名</td>
+<td><code>example.com</code> のように人間が読みやすい形式で表された名前</td>
+<td><a href="#ch-03">第3章</a></td>
+</tr>
+<tr>
+<td>名前解決</td>
+<td>ドメイン名をIPアドレスに変換する作業</td>
+<td><a href="#ch-03">第3章</a></td>
+</tr>
+<tr>
+<td>バケット (bucket)</td>
+<td>S3上でファイルを入れる保管場所の単位。名前はAWS全体で一意</td>
+<td><a href="#ch-11">第11章</a></td>
+</tr>
+<tr>
+<td>パブリックIPアドレス</td>
+<td>インターネット上で直接やり取りできる、世界で重複しない番号</td>
+<td><a href="#ch-03">第3章</a></td>
+</tr>
+<tr>
+<td>ファイアウォール</td>
+<td>通信を検査して通すか通さないかを判断する仕組み</td>
+<td><a href="#ch-08">第8章</a></td>
+</tr>
+<tr>
+<td>プライベートIPアドレス</td>
+<td>特定のネットワーク内でのみ通用する番号。<code>10.0.0.0</code> などの範囲</td>
+<td><a href="#ch-03">第3章</a></td>
+</tr>
+<tr>
+<td>Private Subnet</td>
+<td>そのようなRoute Tableが関連付けられていないSubnet</td>
+<td><a href="#ch-06">第6章</a></td>
+</tr>
+<tr>
+<td>プロトコル</td>
+<td>通信の方式。Webの通信はTCP</td>
+<td><a href="#ch-08">第8章</a></td>
+</tr>
+<tr>
+<td>ヘルスチェック</td>
+<td>ALBが各EC2に定期的に正常応答を確認する仕組み。失敗すると振り分け対象から外れる</td>
+<td><a href="#ch-09">第9章</a></td>
+</tr>
+<tr>
+<td>ポート</td>
+<td>1台のコンピューターで複数の通信を区別する番号。HTTPは80、HTTPSは443、SSHは22</td>
+<td><a href="#ch-02">第2章</a></td>
+</tr>
+<tr>
+<td>ホストゾーン</td>
+<td>Route 53で、あるドメインのDNSレコードをまとめて管理する単位</td>
+<td><a href="#ch-04">第4章</a></td>
+</tr>
+<tr>
+<td>Public Subnet</td>
+<td><code>0.0.0.0/0</code> がInternet Gatewayを向くRoute Tableが関連付けられたSubnet</td>
+<td><a href="#ch-06">第6章</a></td>
+</tr>
+<tr>
+<td>マネージドサービス</td>
+<td>サーバーの用意・冗長化・パッチ適用などの運用をAWSが代行するサービス形態</td>
+<td><a href="#ch-01">第1章</a></td>
+</tr>
+<tr>
+<td>リージョン</td>
+<td>東京・大阪・バージニアなど、地理的に離れた場所にあるAWSの拠点</td>
+<td><a href="#ch-01">第1章</a></td>
+</tr>
+<tr>
+<td>リスナー</td>
+<td>ALBがどのポート・プロトコルで通信を受け付けるかの設定</td>
+<td><a href="#ch-09">第9章</a></td>
+</tr>
+<tr>
+<td>レイテンシー</td>
+<td>リクエストを送ってから応答が返るまでの遅延時間</td>
+<td><a href="#ch-12">第12章</a></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><strong>目次に戻る</strong>: <a href="#ch-00">README</a></p>
+</section>
+</main>
+</div>
+<script>
+
+(function(){
+  var btn = document.getElementById('tocBtn');
+  var sidebar = document.getElementById('sidebar');
+  if (btn && sidebar) {
+    btn.addEventListener('click', function(){
+      var open = sidebar.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    sidebar.addEventListener('click', function(e){
+      if (e.target.closest('a')) {
+        sidebar.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+  var linkByTarget = {};
+  links.forEach(function(a){ linkByTarget[a.getAttribute('data-target')] = a; });
+
+  var sections = Array.prototype.slice.call(document.querySelectorAll('main > section'));
+  if ('IntersectionObserver' in window && sections.length) {
+    var observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        var link = linkByTarget[entry.target.id];
+        if (!link) return;
+        if (entry.isIntersecting) {
+          links.forEach(function(a){ a.removeAttribute('aria-current'); });
+          link.setAttribute('aria-current', 'true');
+        }
+      });
+    }, { rootMargin: '-10% 0px -70% 0px', threshold: 0 });
+    sections.forEach(function(s){ observer.observe(s); });
+  }
+})();
+
+</script>
+</body>
+</html>
